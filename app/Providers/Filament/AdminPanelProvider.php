@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\WajibkanMfa;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('SDM FKIP Unsil')
+            ->profile()
+            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(PanelsRenderHook::FOOTER, fn () => new HtmlString('<div class="py-2 text-center text-xs text-gray-500">SDM FKIP Unsil · v'.e(config('app.version')).'</div>'))
@@ -60,6 +64,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                WajibkanMfa::class,
             ]);
     }
 }

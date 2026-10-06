@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Filament\Admin\Resources\Users;
+
+use App\Enums\Peran;
+use App\Filament\Admin\Resources\Users\Pages\CreateUser;
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
+use App\Filament\Admin\Resources\Users\Pages\ListUsers;
+use App\Filament\Admin\Resources\Users\Pages\ViewUser;
+use App\Models\User;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
+use UnitEnum;
+
+class UserResource extends Resource
+{
+    protected static ?string $model = User::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Sistem';
+
+    protected static ?string $navigationLabel = 'Pengguna';
+
+    protected static ?string $modelLabel = 'pengguna';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            TextInput::make('name')->label('Nama')->required()->maxLength(150),
+            TextInput::make('email')->label('Surel')->email()->required()->maxLength(150)
+                ->unique(ignoreRecord: true)
+                ->rules([
+                    fn (): string => app()->environment('local') ? 'nullable' : 'ends_with:@unsil.ac.id',
+                ])
+                ->validationMessages(['ends_with' => 'Surel harus berakhiran @unsil.ac.id.']),
+            TextInput::make('password')->label('Kata sandi')->password()->revealable()
+                ->required(fn (string $operation): bool => $operation === 'create')
+                ->dehydrated(fn (?string $state): bool => filled($state))
+                ->minLength(10),
+            TextInput::make('nip')->label('NIP')->maxLength(18),
+            TextInput::make('nidn')->label('NIDN')->maxLength(10),
+            TextInput::make('no_hp')->label('No. HP')->maxLength(20),
+            Select::make('roles')->label('Peran')->multiple()->preload()
+                ->relationship('roles', 'name')
+                ->getOptionLabelFromRecordUsing(fn ($record): string => Peran::tryFrom($record->name)?->getLabel() ?? $record->name),
+            Toggle::make('is_aktif')->label('Aktif')->default(true)
+                ->disabled(fn (?User $record): bool => $record?->is(auth()->user()) ?? false),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')->label('Nama')->searchable()->sortable(),
+                TextColumn::make('email')->label('Surel')->searchable(),
+                TextColumn::make('roles.name')->label('Peran')->badge()
+                    ->formatStateUsing(fn (string $state): string => Peran::tryFrom($state)?->getLabel() ?? $state),
+                ToggleColumn::make('is_aktif')->label('Aktif')
+                    ->disabled(fn (User $record): bool => $record->is(auth()->user())),
+                TextColumn::make('last_login_at')->label('Login terakhir')->dateTime('d F Y H:i')->placeholder('-'),
+                IconColumn::make('mfa')->label('MFA')->boolean()
+                    ->state(fn (User $record): bool => filled($record->app_authentication_secret)),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('resetMfa')->label('Reset MFA')->icon(Heroicon::OutlinedShieldExclamation)
+                    ->color('warning')->requiresConfirmation()
+                    ->visible(fn (User $record): bool => filled($record->app_authentication_secret))
+                    ->action(function (User $record): void {
+                        $record->forceFill([
+                            'app_authentication_secret' => null,
+                            'app_authentication_recovery_codes' => null,
+                        ])->save();
+
+                        activity()->performedOn($record)->causedBy(auth()->user())->event('reset-mfa')->log('MFA direset');
+                    }),
+                DeleteAction::make()->hidden(fn (User $record): bool => $record->is(auth()->user())),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'view' => ViewUser::route('/{record}'),
+            'edit' => EditUser::route('/{record}/edit'),
+        ];
+    }
+}

@@ -10,7 +10,7 @@ beforeEach(fn () => $this->seed(PeranDanIzinSeeder::class));
 
 function aktor(Peran $peran): User
 {
-    return tap(User::factory()->create(['email' => $peran->value.'@unsil.ac.id']), fn (User $u) => $u->assignRole($peran->value));
+    return tap(User::factory()->create(['email' => $peran->value.'@unsil.ac.id', 'app_authentication_secret' => 'ABCDEFGHIJKLMNOP']), fn (User $u) => $u->assignRole($peran->value));
 }
 
 test('mengubah name user menghasilkan activity dengan nilai lama dan baru', function () {

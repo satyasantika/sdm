@@ -27,15 +27,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        // TODO F2.4: batasi ke permission horizon.lihat
-        Gate::define('viewHorizon', function ($user = null) {
-            if (app()->environment('local')) {
-                return true;
-            }
-
-            return in_array(optional($user)->email, [
-                //
-            ]);
-        });
+        Gate::define('viewHorizon', fn ($user = null) => $user?->can('horizon.lihat') ?? false);
     }
 }
