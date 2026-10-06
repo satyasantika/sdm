@@ -7,6 +7,24 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.5.0] - 2026-10-06
+
+### Ditambahkan
+
+- Kebijakan "tautan, bukan unggahan": tabel `tautan_berkas`, validasi `TautanBerkasValid`, kontrak `PenyimpananBerkas`,
+  job `PeriksaTautanBerkas` (anti-SSRF, antrean `tautan`), route `tautan.buka` berotorisasi, uji arsitektur tanpa unggah (F5.1).
+- Riwayat jabatan fungsional dengan sinkron jabatan terkini dan validasi jenjang (F5.2), pangkat/golongan dan KGB (F5.3),
+  jabatan struktural/tugas tambahan dengan `PejabatAktifWidget` (F5.4), pendidikan dengan penanda tertinggi (F5.5),
+  sertifikasi dengan status berlaku (F5.6), penghargaan dan pelatihan (F5.7), keluarga terenkripsi dengan akses terbatas (F5.8),
+  studi lanjut yang menyelaraskan status tugas belajar (F5.9).
+- Uji matriks otorisasi riwayat (10 model × 6 peran × 4 aksi) dan contoh riwayat di `DemoSeeder` (F5.10).
+
+### Catatan
+
+- Pimpinan dan admin-prodi tidak dapat membuka tautan berkas sensitif meskipun pimpinan memiliki izin `tautan-sensitif.lihat`
+  (BR-30 menjadi acuan).
+- Alias morph berbahasa Indonesia memakai `Relation::morphMap` (tidak ketat) agar log audit lama tetap terbaca.
+
 ## [0.4.0] - 2026-10-06
 
 ### Ditambahkan

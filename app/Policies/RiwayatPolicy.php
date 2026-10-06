@@ -25,7 +25,14 @@ abstract class RiwayatPolicy
 
     public function view(User $user, Model $riwayat): bool
     {
-        return $user->can('riwayat.lihat') && $this->dalamCakupan($user, $this->pegawaiDari($riwayat));
+        $pegawai = $this->pegawaiDari($riwayat);
+
+        // Pemilik data selalu boleh melihat riwayatnya sendiri (perubahan lewat usulan di F6).
+        if ($pegawai?->user_id !== null && $pegawai->user_id === $user->getKey()) {
+            return true;
+        }
+
+        return $user->can('riwayat.lihat') && $this->dalamCakupan($user, $pegawai);
     }
 
     public function create(User $user): bool
