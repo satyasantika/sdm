@@ -266,6 +266,7 @@ class PegawaiResource extends Resource
             RelationManagers\SertifikasiRelationManager::class,
             RelationManagers\PenghargaanRelationManager::class,
             RelationManagers\PelatihanRelationManager::class,
+            RelationManagers\KeluargaRelationManager::class,
         ];
     }
 

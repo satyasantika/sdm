@@ -208,6 +208,11 @@ class Pegawai extends Model
         return $per;
     }
 
+    public function keluarga(): HasMany
+    {
+        return $this->hasMany(Keluarga::class);
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);
