@@ -1,7 +1,11 @@
 <?php
 
+use App\Enums\Peran;
 use App\Models\User;
+use Database\Seeders\PeranDanIzinSeeder;
 use Database\Seeders\SuperAdminSeeder;
+
+beforeEach(fn () => $this->seed(PeranDanIzinSeeder::class));
 
 test('tamu diarahkan ke halaman login admin', function () {
     $this->get('/admin')->assertRedirect('/admin/login');
@@ -12,25 +16,25 @@ test('halaman login berbahasa indonesia dengan merek sdm fkip unsil', function (
 });
 
 test('user aktif ber-email unsil dapat membuka admin', function () {
-    $user = User::factory()->create(['email' => 'budi@unsil.ac.id']);
+    $user = tap(User::factory()->create(['email' => 'budi@unsil.ac.id']), fn ($u) => $u->assignRole(Peran::AdminProdi->value));
 
     $this->actingAs($user)->get('/admin')->assertOk()->assertSee('v'.config('app.version'));
 });
 
 test('user tidak aktif ditolak dengan 403', function () {
-    $user = User::factory()->create(['email' => 'budi@unsil.ac.id', 'is_aktif' => false]);
+    $user = tap(User::factory()->create(['email' => 'budi@unsil.ac.id', 'is_aktif' => false]), fn ($u) => $u->assignRole(Peran::AdminProdi->value));
 
     $this->actingAs($user)->get('/admin')->assertForbidden();
 });
 
 test('user ber-email di luar unsil ditolak di lingkungan non-local', function () {
-    $user = User::factory()->create(['email' => 'budi@contoh.com']);
+    $user = tap(User::factory()->create(['email' => 'budi@contoh.com']), fn ($u) => $u->assignRole(Peran::AdminProdi->value));
 
     $this->actingAs($user)->get('/admin')->assertForbidden();
 });
 
 test('last_login_at terisi setelah login', function () {
-    $user = User::factory()->create(['email' => 'budi@unsil.ac.id']);
+    $user = tap(User::factory()->create(['email' => 'budi@unsil.ac.id']), fn ($u) => $u->assignRole(Peran::AdminProdi->value));
     expect($user->last_login_at)->toBeNull();
 
     auth()->login($user);

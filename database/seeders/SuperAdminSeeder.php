@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Peran;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -18,9 +19,11 @@ class SuperAdminSeeder extends Seeder
             return;
         }
 
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             ['email' => $email],
             ['name' => 'Super Admin', 'password' => $password, 'is_aktif' => true, 'email_verified_at' => now()],
         );
+
+        $user->assignRole(Peran::SuperAdmin->value);
     }
 }
