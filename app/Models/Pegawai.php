@@ -32,6 +32,8 @@ use Illuminate\Support\Facades\Crypt;
  * @property-read Prodi|null $prodi
  * @property-read JabatanFungsional|null $jabatanFungsional
  * @property-read Golongan|null $golongan
+ * @property-read UnitKerja|null $unitKerja
+ * @property-read RiwayatPendidikan|null $pendidikanTertinggi
  * @property string|null $nik
  * @property string|null $npwp
  * @property string|null $nomor_rekening

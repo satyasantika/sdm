@@ -56,6 +56,10 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             return false;
         }
 
+        if ($panel->getId() === 'swalayan') {
+            return $this->can('swalayan.akses') && $this->pegawai()->exists();
+        }
+
         if (! $this->hasAnyRole(array_map(fn (Peran $p) => $p->value, Peran::panelAdmin()))) {
             return false;
         }
