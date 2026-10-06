@@ -16,10 +16,15 @@ trait TercatatAktivitas
 {
     use LogsActivity;
 
-    /** @var list<string> */
-    public static array $kolomSensitif = [
-        'password', 'remember_token', 'app_authentication_secret', 'app_authentication_recovery_codes',
-    ];
+    /**
+     * Kolom yang nilainya tidak boleh masuk log; model dapat menimpa method ini.
+     *
+     * @return list<string>
+     */
+    public static function kolomSensitif(): array
+    {
+        return ['password', 'remember_token', 'app_authentication_secret', 'app_authentication_recovery_codes'];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -27,13 +32,13 @@ trait TercatatAktivitas
             ->logFillable()
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
-            ->logExcept(static::$kolomSensitif);
+            ->logExcept(static::kolomSensitif());
     }
 
     protected static function bootTercatatAktivitas(): void
     {
         static::updated(function (Model $model): void {
-            $diubah = array_values(array_intersect(array_keys($model->getChanges()), static::$kolomSensitif));
+            $diubah = array_values(array_intersect(array_keys($model->getChanges()), static::kolomSensitif()));
 
             if ($diubah === []) {
                 return;
