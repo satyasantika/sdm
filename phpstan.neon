@@ -9,3 +9,8 @@ parameters:
         - database/
         - routes/
     tmpDir: storage/phpstan
+    ignoreErrors:
+        # Relasi Eloquent & HasFactory pada model domain tidak perlu anotasi generik penuh.
+        -
+            identifier: missingType.generics
+            path: app/Models/*

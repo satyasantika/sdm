@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\Pages\ViewUser;
+use App\Models\Role;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -59,6 +61,9 @@ class UserResource extends Resource
             Select::make('roles')->label('Peran')->multiple()->preload()
                 ->relationship('roles', 'name')
                 ->getOptionLabelFromRecordUsing(fn ($record): string => Peran::tryFrom($record->name)?->getLabel() ?? $record->name),
+            Select::make('prodi_id')->label('Program studi')->relationship('prodi', 'nama')->searchable()->preload()
+                ->required(fn (Get $get): bool => Role::whereIn('id', (array) $get('roles'))->where('name', Peran::AdminProdi->value)->exists())
+                ->validationMessages(['required' => 'Program studi wajib diisi untuk peran Admin Prodi.']),
             Toggle::make('is_aktif')->label('Aktif')->default(true)
                 ->disabled(fn (?User $record): bool => $record?->is(auth()->user()) ?? false),
         ]);
