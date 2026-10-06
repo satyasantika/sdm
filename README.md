@@ -71,3 +71,8 @@ Semua jadwal memakai zona waktu `Asia/Jakarta` dan `onOneServer()`. Jalankan lok
 | Mingguan | `queue:prune-batches`, `queue:prune-failed` | Kebersihan tabel antrean |
 
 Pengiriman WhatsApp bersifat opsional: set `WHATSAPP_ENABLED=true`, `WHATSAPP_ENDPOINT`, dan `WHATSAPP_TOKEN` di `.env`.
+
+## Integrasi
+
+Sistem lain (Akreditasi, Keuangan, LMS) membaca data dosen dan pejabat lewat API read-only bertoken Sanctum;
+lihat [docs/API.md](docs/API.md). Integrasi API SISTER/PDDIKTI adalah pengembangan lanjut dan memerlukan akses resmi.

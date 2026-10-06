@@ -7,6 +7,21 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.9.0] - 2026-10-06
+
+### Ditambahkan
+
+- Dasbor ber-cache (statistik, grafik jabatan/pendidikan, dosen per prodi, pensiun 5 tahun) dengan pembersihan cache saat data berubah (F9.1).
+- Ekspor profil dosen prodi, beban kerja, rekognisi, pengembangan kompetensi, dan tenaga kependidikan untuk akreditasi, serta syarat unggul SDM (F9.2).
+- Jumlah mahasiswa per prodi dan rasio dosen–mahasiswa (F9.3).
+- DUK, rekap pejabat, daftar pensiun (PDF/Excel) dan cetak profil pegawai PDF tanpa data sensitif (F9.4).
+- Sanctum dan pengelolaan token klien API di panel admin (token tampil sekali, dapat dicabut) (F9.5).
+- API v1 read-only `/api/v1/dosen`, `/api/v1/dosen/{id}`, `/api/v1/pejabat` beserta `docs/API.md` (F9.6).
+
+### Catatan
+
+- Integrasi SISTER/PDDIKTI belum dikerjakan (memerlukan akses resmi).
+
 ## [0.8.0] - 2026-10-06
 
 ### Ditambahkan
