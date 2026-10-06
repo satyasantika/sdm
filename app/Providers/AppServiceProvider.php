@@ -15,6 +15,7 @@ use App\Models\Konfigurasi;
 use App\Models\Pegawai;
 use App\Models\Prodi;
 use App\Models\RiwayatJabatanFungsional;
+use App\Models\RiwayatJabatanStruktural;
 use App\Models\RiwayatKgb;
 use App\Models\RiwayatPangkat;
 use App\Models\StatusKepegawaian;
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         'riwayat_jabatan_fungsional' => RiwayatJabatanFungsional::class,
         'riwayat_pangkat' => RiwayatPangkat::class,
         'riwayat_kgb' => RiwayatKgb::class,
+        'riwayat_jabatan_struktural' => RiwayatJabatanStruktural::class,
     ];
 
     /**

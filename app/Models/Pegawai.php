@@ -159,6 +159,11 @@ class Pegawai extends Model
         return $this->hasMany(RiwayatKgb::class)->orderByDesc('tmt');
     }
 
+    public function riwayatJabatanStruktural(): HasMany
+    {
+        return $this->hasMany(RiwayatJabatanStruktural::class)->orderByDesc('tmt_mulai');
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);
