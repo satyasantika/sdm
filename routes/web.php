@@ -8,7 +8,7 @@ Route::get('/', function () {
     $user = auth()->user();
 
     if ($user === null) {
-        return redirect()->route('filament.admin.auth.login');
+        return view('landing');
     }
 
     return redirect()->to($user->can('swalayan.akses') && $user->pegawai()->exists() ? '/saya' : '/admin');

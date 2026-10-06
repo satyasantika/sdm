@@ -19,9 +19,13 @@ Rilis produksi pertama (kandidat; tag menunggu keputusan pengelola).
 - Dockerfile multi-stage, `compose.production.yaml` (app, web, queue/Horizon, scheduler, MySQL 8.4, Redis 7), perintah
   `sdm:hitung-ulang-hash`, `docs/DEPLOY.md` (F10.3).
 - `docs/PANDUAN-PENGGUNA.md`, `docs/OPERASI.md`, uji alur utama UAT (F10.4).
+- Landing page di `/` (tamu) dan panduan HTML per peran dengan tangkapan layar di `/panduan/` (`public/panduan/`).
+- Dukungan sub-path `https://supportfkip.unsil.ac.id/sdm`: nginx memotong `/sdm` dan mengirim `X-Forwarded-Prefix`, Horizon di `/sdm/horizon`, cookie sesi ber-path `/sdm` (docs/DEPLOY.md §1a).
 
 ### Diperbaiki
 
+- `TRUSTED_PROXIES=*` kini benar-benar berarti semua proxy (sebelumnya diperlakukan sebagai daftar IP literal).
+- Image produksi menjalankan `filament:assets` (aset Filament tidak lagi bergantung pada berkas lokal yang di-ignore git).
 - Supervisor Horizon di semua lingkungan kini menyebut `connection` (sebelumnya container `queue` gagal start di production).
 - Limiter `api` tidak lagi galat untuk permintaan berautentikasi sesi.
 - Penanda pendidikan tertinggi memicu pembersihan cache dasbor (sebelumnya statistik jenjang bisa basi hingga 1 jam).

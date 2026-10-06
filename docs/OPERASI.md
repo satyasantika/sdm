@@ -4,7 +4,7 @@ Untuk super-admin dan operator server. Perintah `docker compose` memakai `-f com
 
 ## 1. Memantau antrean (Horizon)
 
-- Buka `/horizon` (hanya super-admin). Lima supervisor harus aktif: `default`, `impor`, `ekspor`, `notifikasi`, `tautan`.
+- Buka `/horizon` (di produksi sub-path: `/sdm/horizon`; hanya super-admin). Lima supervisor harus aktif: `default`, `impor`, `ekspor`, `notifikasi`, `tautan`.
 - Dari CLI: `docker compose exec queue php artisan horizon:status`.
 - Metrik yang diperhatikan: *Failed Jobs* (harus 0), *Wait Time* per antrean, *Recent Jobs*.
 

@@ -33,6 +33,7 @@ Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi a
 | [`docs/PANDUAN-PENGGUNA.md`](docs/PANDUAN-PENGGUNA.md) | Panduan per peran dan FAQ |
 | [`docs/OPERASI.md`](docs/OPERASI.md) | Horizon, regulasi tanpa deploy, kebijakan privasi, hak subjek data |
 | [`docs/DEPLOY.md`](docs/DEPLOY.md) · [`docs/PEMULIHAN.md`](docs/PEMULIHAN.md) · [`docs/KINERJA.md`](docs/KINERJA.md) | Deploy produksi, backup/pulihkan, catatan kinerja |
+| [`public/panduan/`](public/panduan/index.html) | Panduan HTML per peran dengan tangkapan layar (landing page `/panduan/`) |
 | [`docs/API.md`](docs/API.md) | API integrasi read-only v1 |
 
 ## Cara kontribusi

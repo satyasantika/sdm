@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Panduan Super Admin / Operator — Panduan SDM FKIP</title>
+<link rel="stylesheet" href="panduan.css"></head><body>
+<header class="situs"><div class="wadah"><strong>Panduan SDM FKIP Unsil</strong><nav class="peran" aria-label="Peran">
+<a href="index.html">Beranda</a>
+<a href="admin-kepegawaian.html">Admin Kepegawaian</a>
+<a href="admin-prodi.html">Admin Prodi</a>
+<a href="pimpinan.html">Pimpinan</a>
+<a href="dosen-tendik.html">Dosen &amp; Tendik</a>
+<a href="super-admin.html" aria-current="page">Super Admin / Operator</a>
+</nav></div></header>
+<main><div class="wadah"><h1>Panduan Super Admin / Operator</h1><p class="lead">Pengelolaan akun, token API, audit, dan pemantauan sistem.</p>
+<h2>1. Masuk dan MFA</h2><p>Super Admin wajib memakai MFA, sama seperti Admin Kepegawaian.</p><figure><img src="img/admin-mfa.png" alt="Kode autentikasi 6 digit." loading="lazy"><figcaption>Kode autentikasi 6 digit.</figcaption></figure><h2>2. Pengguna</h2><p><b>Sistem → Pengguna</b>: kelola akun, peran, prodi, dan status aktif (nonaktifkan akun bermasalah).</p><figure><img src="img/super-pengguna.png" alt="Daftar pengguna." loading="lazy"><figcaption>Daftar pengguna.</figcaption></figure><h2>3. Token API</h2><ol class="langkah"><li><b>Sistem → Token API → Buat token klien</b>; isi nama klien, nama token, dan masa berlaku.</li><li>Salin token yang tampil <b>sekali</b> pada jendela konfirmasi.</li><li>Cabut token dari tabel bila bocor atau tidak dipakai.</li></ol><figure><img src="img/super-token-api.png" alt="Daftar token API." loading="lazy"><figcaption>Daftar token API.</figcaption></figure><div class="catatan">Dokumentasi endpoint ada di <code>docs/API.md</code> (autentikasi Bearer, ability <code>sdm:read</code>, 60 permintaan/menit).</div><h2>4. Log audit</h2><p>Mencatat perubahan data, ekspor, tampil data sensitif, dan pembuatan/pencabutan token.</p><figure><img src="img/super-audit.png" alt="Log audit." loading="lazy"><figcaption>Log audit.</figcaption></figure><h2>5. Horizon (antrean)</h2><p>Buka <code>/horizon</code> (di server produksi: <code>/sdm/horizon</code>). Pastikan lima supervisor aktif dan tidak ada job gagal; ulangi job gagal dari tab <i>Failed Jobs</i>.</p><figure><img src="img/super-horizon.png" alt="Dasbor Horizon." loading="lazy"><figcaption>Dasbor Horizon.</figcaption></figure><div class="catatan">Panduan operasi lengkap: <code>docs/OPERASI.md</code>; deploy: <code>docs/DEPLOY.md</code>; backup: <code>docs/PEMULIHAN.md</code>.</div>
+</div></main>
+<footer><div class="wadah">Tangkapan layar memakai data demo fiktif. Aplikasi: <a href="../">halaman utama SDM FKIP</a> · v1.0.0</div></footer>
+</body></html>

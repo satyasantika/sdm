@@ -1,5 +1,7 @@
 # Panduan Pengguna — Sistem Informasi SDM FKIP Unsil
 
+> Versi bergambar (HTML, per peran) ada di landing page: `/panduan/` (produksi: https://supportfkip.unsil.ac.id/sdm/panduan/).
+
 Alamat: panel admin `/admin` (admin kepegawaian, admin prodi, pimpinan) dan swalayan `/saya` (dosen/tendik).
 Data pribadi sensitif (NIK, NPWP, rekening) disimpan terenkripsi dan hanya tampil penuh bagi yang berwenang, dengan
 pencatatan akses. **Berkas (SK, ijazah, dll.) tidak diunggah ke sistem**: Anda menempelkan tautan Google Drive/Docs

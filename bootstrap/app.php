@@ -19,7 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         // Di belakang reverse proxy kampus (TLS dihentikan di proxy): isi TRUSTED_PROXIES dengan IP/CIDR proxy, dipisah koma.
-        $middleware->trustProxies(at: env('TRUSTED_PROXIES') ? array_map('trim', explode(',', (string) env('TRUSTED_PROXIES'))) : null);
+        $middleware->trustProxies(
+            at: in_array(env('TRUSTED_PROXIES'), ['*', '**'], true) ? env('TRUSTED_PROXIES') : (env('TRUSTED_PROXIES') ? array_map('trim', explode(',', (string) env('TRUSTED_PROXIES'))) : null),
+            headers: Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT
+                | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX,
+        );
         $middleware->append(HeaderKeamanan::class);
         $middleware->alias([
             'abilities' => CheckAbilities::class,

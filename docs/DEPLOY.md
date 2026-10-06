@@ -20,6 +20,40 @@ Salin `.env.example` → `.env` di server, lalu isi (jangan commit; simpan salin
 | `TRUSTED_PROXIES` | IP/CIDR reverse proxy kampus (dipisah koma) agar HTTPS & IP klien dikenali; `*` hanya bila jaringan proxy terisolasi |
 | `WEB_PORT` | port host untuk Nginx (bawaan 8080); letakkan reverse proxy HTTPS kampus di depannya |
 
+## 1a. Dilayani di sub-path `https://supportfkip.unsil.ac.id/sdm`
+
+Container `web` melayani aplikasi di akar (`/`) **dan** di bawah awalan `/sdm`. Reverse proxy kampus meneruskan jalur
+**apa adanya** (tanpa memotong `/sdm`) dan meneruskan header protokol/host:
+
+```nginx
+location /sdm/ {
+    proxy_pass http://<host-docker>:8080;       # tanpa URI di akhir → jalur /sdm/... dipertahankan
+    proxy_set_header Host              $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host  $host;
+    proxy_set_header X-Forwarded-Port  $server_port;
+    client_max_body_size 6M;
+}
+location = /sdm { return 301 /sdm/; }
+```
+
+Nginx di container memotong `/sdm` dan mengirimkannya ke PHP sebagai `X-Forwarded-Prefix`; Laravel membangun semua URL
+(tautan, aset, Livewire, redirect) dengan `https://supportfkip.unsil.ac.id/sdm/...`. Isi `.env`:
+
+| Kunci | Nilai |
+|---|---|
+| `APP_URL` | `https://supportfkip.unsil.ac.id/sdm` |
+| `ASSET_URL` | `https://supportfkip.unsil.ac.id/sdm` (juga dibutuhkan Horizon) |
+| `SESSION_PATH` / `SESSION_COOKIE` | `/sdm` / `sdm_session` (cookie tidak bocor ke aplikasi lain di host yang sama) |
+| `SESSION_SECURE_COOKIE` | `true` |
+| `HORIZON_PATH` | `sdm/horizon` (dasbor Horizon di `/sdm/horizon`) |
+| `TRUSTED_PROXIES` | bawaan compose mempercayai jaringan docker (nginx container); tambahkan IP reverse proxy bila perlu |
+
+Alamat penting: halaman depan `https://supportfkip.unsil.ac.id/sdm/`, admin `/sdm/admin`, swalayan `/sdm/saya`, API
+`/sdm/api/v1/...` (kirim `Authorization: Bearer`), panduan `/sdm/panduan/`, kesehatan `/sdm/api/health`.
+Pemeriksaan: `curl -sI https://supportfkip.unsil.ac.id/sdm/admin/login` harus 200 dan semua `href`/`src` di HTML berawalan `https://supportfkip.unsil.ac.id/sdm/`.
+
 ## 2. Build dan jalankan
 
 ```bash

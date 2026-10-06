@@ -37,6 +37,7 @@ COPY --from=aset --chown=www-data:www-data /build/public/build ./public/build
 RUN rm -rf docker tests docs vibecoding .github \
     && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/tmp bootstrap/cache \
     && php artisan package:discover --ansi \
+    && php artisan filament:assets --ansi \
     && chown -R www-data:www-data storage bootstrap/cache
 
 USER www-data

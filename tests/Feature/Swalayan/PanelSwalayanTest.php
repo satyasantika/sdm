@@ -126,7 +126,7 @@ test('halaman root mengarahkan sesuai peran', function () {
     $admin = User::factory()->create(['email' => 'adm@unsil.ac.id', 'app_authentication_secret' => 'ABCDEFGHIJKLMNOP']);
     $admin->assignRole(Peran::AdminKepegawaian->value);
 
-    $this->get('/')->assertRedirect(route('filament.admin.auth.login'));
+    $this->get('/')->assertOk()->assertSee('Panduan Pengguna');
     $this->actingAs($user)->get('/')->assertRedirect('/saya');
     $this->actingAs($admin)->get('/')->assertRedirect('/admin');
 });
