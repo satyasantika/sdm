@@ -174,6 +174,17 @@ class Pegawai extends Model
         return $this->hasOne(RiwayatPendidikan::class)->where('is_pendidikan_tertinggi', true);
     }
 
+    public function sertifikasi(): HasMany
+    {
+        return $this->hasMany(Sertifikasi::class)->orderByDesc('tanggal_terbit');
+    }
+
+    /** Memiliki sertifikat pendidik dosen (dipakai statistik & API). */
+    public function punyaSerdos(): bool
+    {
+        return $this->sertifikasi()->whereHas('jenisSertifikasi', fn (Builder $q) => $q->where('is_serdos', true))->exists();
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);

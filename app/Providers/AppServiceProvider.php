@@ -19,6 +19,7 @@ use App\Models\RiwayatJabatanStruktural;
 use App\Models\RiwayatKgb;
 use App\Models\RiwayatPangkat;
 use App\Models\RiwayatPendidikan;
+use App\Models\Sertifikasi;
 use App\Models\StatusKepegawaian;
 use App\Models\TokenAkses;
 use App\Observers\KonfigurasiObserver;
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
         'riwayat_kgb' => RiwayatKgb::class,
         'riwayat_jabatan_struktural' => RiwayatJabatanStruktural::class,
         'riwayat_pendidikan' => RiwayatPendidikan::class,
+        'sertifikasi' => Sertifikasi::class,
     ];
 
     /**
