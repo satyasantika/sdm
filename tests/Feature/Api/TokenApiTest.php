@@ -64,21 +64,21 @@ test('klien api tidak dapat mengakses panel mana pun', function () {
     $this->actingAs($klien)->get('/saya')->assertForbidden();
 });
 
-test('token valid mengakses ping, token dicabut atau tanpa ability ditolak', function () {
+test('token valid mengakses api, token dicabut atau tanpa ability ditolak', function () {
     $admin = akunToken(Peran::SuperAdmin);
     [$klien, $polos] = app(BuatTokenKlienApi::class)->handle($admin, 'Keuangan', 'keu-1');
 
-    $this->withToken($polos)->getJson('/api/v1/ping')->assertOk()->assertJson(['pong' => true]);
+    $this->withToken($polos)->getJson('/api/v1/dosen')->assertOk();
 
     $tanpaAbility = $klien->createToken('lain', ['sdm:write'])->plainTextToken;
     app('auth')->forgetGuards();
-    $this->withToken($tanpaAbility)->getJson('/api/v1/ping')->assertForbidden();
+    $this->withToken($tanpaAbility)->getJson('/api/v1/dosen')->assertForbidden();
 
     TokenAkses::where('name', 'keu-1')->delete();
 
     app('auth')->forgetGuards();
-    $this->withToken($polos)->getJson('/api/v1/ping')->assertUnauthorized();
-    $this->flushHeaders()->getJson('/api/v1/ping')->assertUnauthorized();
+    $this->withToken($polos)->getJson('/api/v1/dosen')->assertUnauthorized();
+    $this->flushHeaders()->getJson('/api/v1/dosen')->assertUnauthorized();
 });
 
 test('super-admin dapat mencabut token lewat panel dan tercatat', function () {
@@ -96,7 +96,7 @@ test('limit api 60 per menit per token', function () {
     [, $polos] = app(BuatTokenKlienApi::class)->handle(akunToken(Peran::SuperAdmin), 'Batas', 'b-1');
 
     foreach (range(1, 60) as $i) {
-        $this->withToken($polos)->getJson('/api/v1/ping')->assertOk();
+        $this->withToken($polos)->getJson('/api/v1/dosen')->assertOk();
     }
-    $this->withToken($polos)->getJson('/api/v1/ping')->assertStatus(429);
+    $this->withToken($polos)->getJson('/api/v1/dosen')->assertStatus(429);
 });
