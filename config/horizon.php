@@ -210,23 +210,27 @@ return [
     'environments' => [
         'production' => [
             'supervisor-default' => [
+                'connection' => 'redis',
                 'queue' => ['default'],
                 'maxProcesses' => 2,
                 'timeout' => 120,
             ],
             'supervisor-impor' => [
+                'connection' => 'redis',
                 'queue' => ['impor'],
                 'maxProcesses' => 2,
                 'timeout' => 600,
                 'tries' => 1,
             ],
             'supervisor-ekspor' => [
+                'connection' => 'redis',
                 'queue' => ['ekspor'],
                 'maxProcesses' => 2,
                 'timeout' => 600,
                 'tries' => 1,
             ],
             'supervisor-notifikasi' => [
+                'connection' => 'redis',
                 'queue' => ['notifikasi'],
                 'maxProcesses' => 3,
                 'timeout' => 60,
@@ -234,6 +238,7 @@ return [
                 'backoff' => [10, 60, 300],
             ],
             'supervisor-tautan' => [
+                'connection' => 'redis',
                 'queue' => ['tautan'],
                 'maxProcesses' => 1,
                 'timeout' => 30,
@@ -242,23 +247,27 @@ return [
 
         'local' => [
             'supervisor-default' => [
+                'connection' => 'redis',
                 'queue' => ['default'],
                 'maxProcesses' => 2,
                 'timeout' => 120,
             ],
             'supervisor-impor' => [
+                'connection' => 'redis',
                 'queue' => ['impor'],
                 'maxProcesses' => 2,
                 'timeout' => 600,
                 'tries' => 1,
             ],
             'supervisor-ekspor' => [
+                'connection' => 'redis',
                 'queue' => ['ekspor'],
                 'maxProcesses' => 2,
                 'timeout' => 600,
                 'tries' => 1,
             ],
             'supervisor-notifikasi' => [
+                'connection' => 'redis',
                 'queue' => ['notifikasi'],
                 'maxProcesses' => 3,
                 'timeout' => 60,
@@ -266,6 +275,7 @@ return [
                 'backoff' => [10, 60, 300],
             ],
             'supervisor-tautan' => [
+                'connection' => 'redis',
                 'queue' => ['tautan'],
                 'maxProcesses' => 1,
                 'timeout' => 30,

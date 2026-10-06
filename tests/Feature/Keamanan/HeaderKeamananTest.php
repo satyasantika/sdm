@@ -34,3 +34,7 @@ test('konfigurasi sesi aman dan debug mati di production', function () {
     expect($konfig)->toHaveKey('secure');
     expect(file_get_contents(config_path('session.php')))->toContain("env('APP_ENV') === 'production'");
 });
+
+test('cors api tertutup secara bawaan', function () {
+    $this->get('/api/health', ['Origin' => 'https://evil.example.com'])->assertHeaderMissing('Access-Control-Allow-Origin');
+});

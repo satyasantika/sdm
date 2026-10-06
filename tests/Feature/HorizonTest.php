@@ -19,3 +19,13 @@ test('lingkungan local memiliki lima supervisor bernama', function () {
 test('snapshot horizon terjadwal setiap lima menit', function () {
     $this->artisan('schedule:list')->expectsOutputToContain('horizon:snapshot')->assertSuccessful();
 });
+
+test('setiap supervisor di semua lingkungan menyebut koneksi dan antrean', function () {
+    foreach (config('horizon.environments') as $lingkungan => $supervisors) {
+        expect(array_keys($supervisors))->toHaveCount(5);
+
+        foreach ($supervisors as $nama => $opsi) {
+            expect($opsi)->toHaveKeys(['connection', 'queue'], "{$lingkungan}.{$nama}");
+        }
+    }
+});
