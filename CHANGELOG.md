@@ -7,6 +7,34 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [1.0.0] - 2026-10-06
+
+Rilis produksi pertama (kandidat; tag menunggu keputusan pengelola).
+
+### Ditambahkan
+
+- Pengerasan keamanan: header keamanan global (CSP report-only, HSTS di production), cookie sesi aman, CORS API tertutup,
+  trusted proxies, suite `tests/Feature/Keamanan` (IDOR, rute terlindung, XSS, tautan/SSRF, rate limit, mass assignment, data sensitif) (F10.1).
+- Kinerja: indeks tambahan, uji jumlah kueri, `BebanUjiSeeder`, `docs/KINERJA.md`, `composer produksi`, `docs/PEMULIHAN.md` (F10.2).
+- Dockerfile multi-stage, `compose.production.yaml` (app, web, queue/Horizon, scheduler, MySQL 8.4, Redis 7), perintah
+  `sdm:hitung-ulang-hash`, `docs/DEPLOY.md` (F10.3).
+- `docs/PANDUAN-PENGGUNA.md`, `docs/OPERASI.md`, uji alur utama UAT (F10.4).
+
+### Diperbaiki
+
+- Supervisor Horizon di semua lingkungan kini menyebut `connection` (sebelumnya container `queue` gagal start di production).
+- Limiter `api` tidak lagi galat untuk permintaan berautentikasi sesi.
+- Penanda pendidikan tertinggi memicu pembersihan cache dasbor (sebelumnya statistik jenjang bisa basi hingga 1 jam).
+
+### Perlu verifikasi (masih terbuka)
+
+- BUP dosen/profesor/tendik dan pembulatan TMT pensiun; interval KP & KGB; penanda status PPPK dan KGB; syarat jabatan fungsional;
+  nomenklatur jabatan struktural; kriteria urutan DUK; masa retensi arsip kepegawaian (docs/KEPUTUSAN.md, G-01).
+- Teks pemberitahuan privasi (G-02) dan daftar putih domain tautan (G-10b).
+- Pengukuran kinerja di MySQL/staging; CSP masih report-only sampai diuji manual.
+- Uji pulihkan backup, UAT bertanda tangan perwakilan peran, dan checklist go-live (docs/05-UJI-PENERIMAAN.md).
+- Integrasi SISTER/PDDIKTI belum dikerjakan (perlu akses resmi).
+
 ## [0.9.0] - 2026-10-06
 
 ### Ditambahkan

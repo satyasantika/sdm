@@ -8,6 +8,8 @@ Pendidikan Universitas Siliwangi. Satu basis data terpusat memuat data induk peg
 Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi admin, sistem mengingatkan tenggat
 (kenaikan pangkat, KGB, pensiun, dokumen kedaluwarsa), dan menyediakan laporan akreditasi serta API read-only untuk sistem FKIP lain.
 
+**Status rilis:** v1.0.0 (kandidat). Butir *perlu verifikasi* dan checklist go-live masih terbuka; lihat [CHANGELOG](CHANGELOG.md).
+
 ## Prasyarat
 
 - PHP 8.4 (minimal 8.3) dengan ekstensi mbstring, intl, pdo_sqlite, zip, gd, bcmath
@@ -28,6 +30,10 @@ Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi a
 | [`docs/05-UJI-PENERIMAAN.md`](docs/05-UJI-PENERIMAAN.md) | Skenario UAT dan checklist rilis |
 | [`docs/STANDAR-TEKNIS.md`](docs/STANDAR-TEKNIS.md) | Standar teknis bersama |
 | [`docs/STANDAR-GIT.md`](docs/STANDAR-GIT.md) | Standar commit, branch, tag |
+| [`docs/PANDUAN-PENGGUNA.md`](docs/PANDUAN-PENGGUNA.md) | Panduan per peran dan FAQ |
+| [`docs/OPERASI.md`](docs/OPERASI.md) | Horizon, regulasi tanpa deploy, kebijakan privasi, hak subjek data |
+| [`docs/DEPLOY.md`](docs/DEPLOY.md) · [`docs/PEMULIHAN.md`](docs/PEMULIHAN.md) · [`docs/KINERJA.md`](docs/KINERJA.md) | Deploy produksi, backup/pulihkan, catatan kinerja |
+| [`docs/API.md`](docs/API.md) | API integrasi read-only v1 |
 
 ## Cara kontribusi
 

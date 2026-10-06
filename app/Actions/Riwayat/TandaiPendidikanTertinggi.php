@@ -2,6 +2,7 @@
 
 namespace App\Actions\Riwayat;
 
+use App\Events\DataPegawaiBerubah;
 use App\Models\Pegawai;
 use App\Models\RiwayatPendidikan;
 
@@ -21,6 +22,9 @@ class TandaiPendidikanTertinggi
             ->first();
 
         $tertinggi?->forceFill(['is_pendidikan_tertinggi' => true])->saveQuietly();
+
+        // saveQuietly() tidak memicu pembersihan cache dasbor, padahal penanda inilah yang dibaca statistik jenjang tertinggi.
+        DataPegawaiBerubah::dispatch($pegawai->prodi_id);
 
         return $tertinggi;
     }
