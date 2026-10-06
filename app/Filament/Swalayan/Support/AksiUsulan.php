@@ -7,6 +7,7 @@ use App\Enums\JenisTautan;
 use App\Enums\JenisUsulan;
 use App\Filament\Forms\TautanBerkasField;
 use App\Filament\Schemas\BiodataForm;
+use App\Filament\Schemas\DokumenForm;
 use App\Filament\Schemas\JabatanFungsionalForm;
 use App\Filament\Schemas\KeluargaForm;
 use App\Filament\Schemas\KgbForm;
@@ -44,6 +45,7 @@ class AksiUsulan
         'pelatihan' => PelatihanForm::class,
         'keluarga' => KeluargaForm::class,
         'studi_lanjut' => StudiLanjutForm::class,
+        'dokumen_pegawai' => DokumenForm::class,
     ];
 
     public static function pegawaiSaya(): Pegawai

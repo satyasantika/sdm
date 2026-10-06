@@ -46,7 +46,7 @@ class TerapkanUsulanPerubahan
 
         if ($diterapkan !== null && $tabel !== 'pegawai') {
             foreach ($tautan as $nama => $url) {
-                $jenis = JenisTautan::tryFrom((string) $nama) ?? JenisTautan::Lainnya;
+                $jenis = (method_exists($diterapkan, 'jenisTautanUntuk') ? $diterapkan->jenisTautanUntuk((string) $nama) : JenisTautan::tryFrom((string) $nama)) ?? JenisTautan::Lainnya;
                 // Pengusul sudah mengonfirmasi berbagi terbatas saat mengajukan; admin memeriksa buktinya saat verifikasi.
                 $baru = $this->simpanTautan($diterapkan, $jenis, (string) $url, $verifikator);
                 $snapshot = [...$snapshot, ...$this->snapshotTautan([$baru], 'diterapkan')];

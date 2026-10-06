@@ -7,6 +7,7 @@ use App\Contracts\PenyimpananBerkas;
 use App\Enums\Peran;
 use App\Models\Aktivitas;
 use App\Models\BarisImporGagal;
+use App\Models\DokumenPegawai;
 use App\Models\Ekspor;
 use App\Models\Golongan;
 use App\Models\Impor;
@@ -59,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
         'penghargaan' => Penghargaan::class,
         'studi_lanjut' => StudiLanjut::class,
         'usulan_perubahan' => UsulanPerubahan::class,
+        'dokumen_pegawai' => DokumenPegawai::class,
         'pelatihan' => Pelatihan::class,
     ];
 

@@ -45,7 +45,7 @@ class ProfilSaya extends Page
                 'riwayatPendidikan.jenjangPendidikan', 'riwayatPendidikan.tautanBerkas',
                 'sertifikasi.jenisSertifikasi', 'sertifikasi.tautanBerkas',
                 'penghargaan.tautanBerkas', 'pelatihan.tautanBerkas',
-                'keluarga', 'studiLanjut.jenjangPendidikan', 'studiLanjut.tautanBerkas',
+                'keluarga', 'studiLanjut.jenjangPendidikan', 'studiLanjut.tautanBerkas', 'dokumen.jenisDokumen', 'dokumen.tautanBerkas',
             ])
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -130,6 +130,13 @@ class ProfilSaya extends Page
                         TextEntry::make('hubungan')->label('Hubungan')->badge(),
                         TextEntry::make('nama')->label('Nama'),
                         TextEntry::make('nik_tersamar')->label('NIK')->fontFamily('mono'),
+                    ]],
+                ]),
+                $this->tabRiwayat('Dokumen', [
+                    ['dokumen', 'Dokumen kepegawaian', 'dokumen_pegawai', [
+                        TextEntry::make('jenisDokumen.nama')->label('Jenis'),
+                        TextEntry::make('tanggal_kedaluwarsa')->label('Kedaluwarsa')->date('d F Y')->placeholder('-'),
+                        TextEntry::make('status_berlaku')->label('Status')->badge(),
                     ]],
                 ]),
                 $this->tabRiwayat('Studi Lanjut', [

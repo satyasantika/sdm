@@ -12,9 +12,9 @@ class MasterPendukungSeeder extends Seeder
 {
     public function run(): void
     {
+        $urutan = 0;
         foreach (['SD' => 'SD', 'SMP' => 'SMP', 'SMA' => 'SMA/SMK/MA', 'D3' => 'Diploma III', 'D4' => 'Diploma IV',
             'S1' => 'Sarjana (S1)', 'PROFESI' => 'Profesi', 'S2' => 'Magister (S2)', 'SP' => 'Spesialis', 'S3' => 'Doktor (S3)'] as $kode => $nama) {
-            static $urutan = 0;
             JenjangPendidikan::updateOrCreate(['kode' => $kode], ['nama' => $nama, 'urutan' => ++$urutan]);
         }
 

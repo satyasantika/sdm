@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Actions\Pegawai\PerbaruiPegawai;
 use App\Actions\Riwayat\HapusRiwayatJabatanFungsional;
 use App\Actions\Riwayat\HapusRiwayatPangkat;
+use App\Actions\Riwayat\SimpanDokumenPegawai;
 use App\Actions\Riwayat\SimpanKeluarga;
 use App\Actions\Riwayat\SimpanPelatihan;
 use App\Actions\Riwayat\SimpanPenghargaan;
@@ -138,7 +139,7 @@ class RegistriTargetUsulan
     }
 
     /**
-     * Tabel dokumen_pegawai dibuat di F7.1; terdaftar hanya bila model sudah ada.
+     * Dokumen kepegawaian (F7.1).
      *
      * @return array<string, array{model: class-string<Model>, label: string, kolom: list<string>, aturan: array<string, list<mixed>>}>
      */
@@ -148,8 +149,6 @@ class RegistriTargetUsulan
             return [];
         }
 
-        // Model dibuat di F7.1; sebelum itu class-string belum dapat dibuktikan oleh analisis statis.
-        /** @phpstan-ignore return.type */
         return [
             'dokumen_pegawai' => [
                 'model' => DokumenPegawai::class, 'label' => 'Dokumen kepegawaian',
@@ -281,6 +280,7 @@ class RegistriTargetUsulan
             'pelatihan' => app(SimpanPelatihan::class)->handle($pegawai, $data, $record),
             'keluarga' => app(SimpanKeluarga::class)->handle($pegawai, $data, $record),
             'studi_lanjut' => app(SimpanStudiLanjut::class)->handle($pegawai, $data, $oleh, $record, true),
+            'dokumen_pegawai' => app(SimpanDokumenPegawai::class)->handle($pegawai, $data, null, $record),
             default => throw new InvalidArgumentException("Penerapan target [{$tabel}] belum didukung."),
         };
     }

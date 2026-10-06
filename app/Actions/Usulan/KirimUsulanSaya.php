@@ -31,7 +31,7 @@ class KirimUsulanSaya
                 continue;
             }
 
-            if ((JenisTautan::tryFrom($nama)?->isSensitif() ?? false) && ! $nilai['konfirmasi']) {
+            if ((($nama === 'dokumen') || (JenisTautan::tryFrom($nama)?->isSensitif() ?? false)) && ! $nilai['konfirmasi']) {
                 throw ValidationException::withMessages(['konfirmasi' => 'Konfirmasi berbagi terbatas wajib dicentang untuk berkas sensitif.']);
             }
 
