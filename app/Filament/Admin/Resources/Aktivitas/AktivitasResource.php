@@ -75,8 +75,14 @@ class AktivitasResource extends Resource
                     ->formatStateUsing(fn (?string $state) => $state ? class_basename($state) : '-'),
                 TextColumn::make('subject_id')->label('ID objek')->limit(8)->placeholder('-'),
                 TextColumn::make('causer.name')->label('Pelaku')->placeholder('Sistem'),
+                TextColumn::make('kolom_diakses')->label('Kolom diakses')->placeholder('-')
+                    ->state(fn (Aktivitas $record): ?string => $record->properties->get('kolom')),
+                TextColumn::make('ip')->label('IP')->placeholder('-')
+                    ->state(fn (Aktivitas $record): ?string => $record->properties->get('ip')),
             ])
             ->filters([
+                Filter::make('akses_sensitif')->label('Akses data sensitif')
+                    ->query(fn (Builder $query): Builder => $query->where('log_name', 'akses-sensitif')),
                 SelectFilter::make('log_name')->label('Log')
                     ->options(['default' => 'default', 'akses-sensitif' => 'akses-sensitif']),
                 Filter::make('rentang')->label('Rentang tanggal')

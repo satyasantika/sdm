@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisPegawai;
 use App\Enums\StatusAktifPegawai;
+use App\Models\Concerns\MenyamarkanDataSensitif;
 use App\Models\Concerns\TercatatAktivitas;
 use App\Observers\PegawaiObserver;
 use App\Support\HashIdentitas;
@@ -22,6 +23,9 @@ use Illuminate\Support\Facades\Crypt;
 
 /**
  * @property-read string $nama_bergelar
+ * @property string|null $nik
+ * @property string|null $npwp
+ * @property string|null $nomor_rekening
  * @property JenisPegawai $jenis_pegawai
  * @property StatusAktifPegawai $status_aktif
  * @property CarbonInterface|null $tanggal_lahir
@@ -30,7 +34,7 @@ use Illuminate\Support\Facades\Crypt;
 #[ObservedBy(PegawaiObserver::class)]
 class Pegawai extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, TercatatAktivitas;
+    use HasFactory, HasUuids, MenyamarkanDataSensitif, SoftDeletes, TercatatAktivitas;
 
     protected $table = 'pegawai';
 

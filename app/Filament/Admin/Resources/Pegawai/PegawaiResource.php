@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Pegawai;
 
+use App\Actions\Pegawai\TampilkanDataSensitif;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisPegawai;
 use App\Enums\Peran;
@@ -17,6 +18,7 @@ use App\Models\StatusKepegawaian;
 use App\Models\UnitKerja;
 use App\Rules\NikBelumTerdaftar;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -38,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 class PegawaiResource extends Resource
@@ -168,6 +171,22 @@ class PegawaiResource extends Resource
                     TextEntry::make('tanggal_pensiun')->label('Tanggal pensiun')->date('d F Y')->placeholder('-'),
                     TextEntry::make('tmt_masuk')->label('TMT masuk')->date('d F Y')->placeholder('-'),
                 ]),
+                Tab::make('Data pribadi')->columns(2)->schema([
+                    TextEntry::make('tahun_lahir')->label('Tahun lahir')->state(fn (Pegawai $record): ?int => $record->tanggal_lahir?->year)
+                        ->visible(fn (): bool => ! self::bolehLihatSensitif())->placeholder('-'),
+                    TextEntry::make('tanggal_lahir')->label('Tanggal lahir')->date('d F Y')->placeholder('-')
+                        ->visible(fn (): bool => self::bolehLihatSensitif()),
+                    TextEntry::make('nik_tersamar')->label('NIK')->fontFamily('mono')
+                        ->suffixAction(self::aksiTampil('nik', 'NIK')),
+                    TextEntry::make('npwp_tersamar')->label('NPWP')->fontFamily('mono')
+                        ->suffixAction(self::aksiTampil('npwp', 'NPWP')),
+                    TextEntry::make('rekening_tersamar')->label('Nomor rekening')->fontFamily('mono')
+                        ->suffixAction(self::aksiTampil('nomor_rekening', 'Nomor rekening')),
+                    TextEntry::make('nama_bank')->label('Bank')->placeholder('-'),
+                ])->visible(fn (): bool => self::bolehLihatSensitif() || auth()->user()?->can('pegawai.lihat')),
+                Tab::make('Alamat & keluarga')->schema([
+                    TextEntry::make('alamat')->label('Alamat')->placeholder('-'),
+                ])->visible(fn (): bool => self::bolehLihatSensitif()),
             ]),
         ]);
     }
@@ -215,6 +234,27 @@ class PegawaiResource extends Resource
             'view' => ViewPegawai::route('/{record}'),
             'edit' => EditPegawai::route('/{record}/edit'),
         ];
+    }
+
+    private static function bolehLihatSensitif(): bool
+    {
+        return (bool) auth()->user()?->can('pegawai.lihat-sensitif');
+    }
+
+    private static function aksiTampil(string $kolom, string $label): Action
+    {
+        return Action::make('tampil_'.$kolom)
+            ->icon(Heroicon::OutlinedEye)
+            ->tooltip('Tampilkan '.$label)
+            ->visible(fn (Pegawai $record): bool => Gate::allows('viewSensitive', $record))
+            ->modalHeading('Tampilkan '.$label)
+            ->modalDescription('Akses ini dicatat di log audit.')
+            ->fillForm(fn (Pegawai $record): array => [
+                'nilai' => app(TampilkanDataSensitif::class)->handle(auth()->user(), $record, $kolom),
+            ])
+            ->schema([TextInput::make('nilai')->label($label)->readOnly()])
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Tutup');
     }
 
     public static function adalahAdminProdi(): bool
