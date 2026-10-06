@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             MasterKepegawaianSeeder::class,
             MasterJabatanSeeder::class,
             MasterPendukungSeeder::class,
+            KonfigurasiSeeder::class,
             PeranDanIzinSeeder::class,
             SuperAdminSeeder::class,
         ]);

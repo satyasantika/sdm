@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class StatusKepegawaian extends Model
 {
@@ -39,5 +40,11 @@ class StatusKepegawaian extends Model
     public function scopeUrut(Builder $query): Builder
     {
         return $query->orderBy('urutan');
+    }
+
+    /** @return array<string, string> id => label, di-cache pada sdm:master:status-kepegawaian. */
+    public static function opsiAktif(): array
+    {
+        return Cache::remember('sdm:master:status-kepegawaian', 86400, fn (): array => static::query()->aktif()->urut()->pluck('nama', 'id')->all());
     }
 }

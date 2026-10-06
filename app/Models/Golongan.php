@@ -10,7 +10,12 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
+/**
+ * @property-read string $label
+ * @property JenisGolongan $jenis
+ */
 class Golongan extends Model
 {
     use HasFactory, HasUuids, SoftDeletes, TercatatAktivitas;
@@ -40,5 +45,11 @@ class Golongan extends Model
     protected function label(): Attribute
     {
         return Attribute::get(fn (): string => $this->pangkat ? "{$this->kode} — {$this->pangkat}" : $this->kode);
+    }
+
+    /** @return array<string, string> id => label, di-cache pada sdm:master:golongan. */
+    public static function opsiAktif(): array
+    {
+        return Cache::remember('sdm:master:golongan', 86400, fn (): array => static::query()->aktif()->urut()->get()->mapWithKeys(fn (self $g): array => [$g->id => $g->jenis->getLabel().' '.$g->label])->all());
     }
 }

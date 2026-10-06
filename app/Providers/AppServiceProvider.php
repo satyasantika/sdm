@@ -4,7 +4,14 @@ namespace App\Providers;
 
 use App\Enums\Peran;
 use App\Models\Aktivitas;
+use App\Models\Golongan;
+use App\Models\JabatanFungsional;
+use App\Models\Konfigurasi;
+use App\Models\Prodi;
+use App\Models\StatusKepegawaian;
 use App\Models\TokenAkses;
+use App\Observers\KonfigurasiObserver;
+use App\Observers\MasterCacheObserver;
 use App\Policies\AktivitasPolicy;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -35,6 +42,19 @@ class AppServiceProvider extends ServiceProvider
 
         Model::preventLazyLoading(! app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
+
+        Konfigurasi::observe(KonfigurasiObserver::class);
+        foreach ([
+            'prodi' => Prodi::class,
+            'status-kepegawaian' => StatusKepegawaian::class,
+            'golongan' => Golongan::class,
+            'jabatan-fungsional' => JabatanFungsional::class,
+        ] as $nama => $model) {
+            $lupakan = fn () => MasterCacheObserver::lupakan($nama);
+            $model::saved($lupakan);
+            $model::deleted($lupakan);
+            $model::restored($lupakan);
+        }
 
         Gate::policy(Aktivitas::class, AktivitasPolicy::class);
         Gate::before(fn ($user) => $user->hasRole(Peran::SuperAdmin->value) ? true : null);

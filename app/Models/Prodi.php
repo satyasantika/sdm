@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class Prodi extends Model
 {
@@ -27,5 +28,11 @@ class Prodi extends Model
     public function unitKerja(): HasMany
     {
         return $this->hasMany(UnitKerja::class);
+    }
+
+    /** @return array<string, string> id => label, di-cache pada sdm:master:prodi. */
+    public static function opsiAktif(): array
+    {
+        return Cache::remember('sdm:master:prodi', 86400, fn (): array => static::query()->where('is_aktif', true)->orderBy('nama')->pluck('nama', 'id')->all());
     }
 }

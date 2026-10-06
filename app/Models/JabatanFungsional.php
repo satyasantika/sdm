@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class JabatanFungsional extends Model
 {
@@ -56,5 +57,11 @@ class JabatanFungsional extends Model
         return $this->kelompok === $lain->kelompok
             && $this->rumpun === $lain->rumpun
             && $this->urutan < $lain->urutan;
+    }
+
+    /** @return array<string, string> id => label, di-cache pada sdm:master:jabatan-fungsional. */
+    public static function opsiAktif(): array
+    {
+        return Cache::remember('sdm:master:jabatan-fungsional', 86400, fn (): array => static::query()->aktif()->orderBy('kelompok')->orderBy('urutan')->pluck('nama', 'id')->all());
     }
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\UnitKerja;
 use App\Filament\Admin\Resources\UnitKerja\Pages\CreateUnitKerja;
 use App\Filament\Admin\Resources\UnitKerja\Pages\EditUnitKerja;
 use App\Filament\Admin\Resources\UnitKerja\Pages\ListUnitKerja;
+use App\Models\Prodi;
 use App\Models\UnitKerja;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
@@ -53,7 +54,7 @@ class UnitKerjaResource extends Resource
             TextInput::make('nama')->label('Nama')->required()->maxLength(150),
             Select::make('jenis')->label('Jenis')->required()->options(['fakultas' => 'Fakultas', 'jurusan' => 'Jurusan', 'prodi' => 'Program Studi', 'laboratorium' => 'Laboratorium', 'subbagian' => 'Subbagian', 'unit_lain' => 'Unit lain']),
             Select::make('induk_id')->label('Unit induk')->relationship('induk', 'nama')->searchable()->preload(),
-            Select::make('prodi_id')->label('Program studi')->relationship('prodi', 'nama')->searchable()->preload(),
+            Select::make('prodi_id')->label('Program studi')->options(fn (): array => Prodi::opsiAktif())->searchable(),
             TextInput::make('kode_eksternal')->label('Kode eksternal')->maxLength(50),
             Toggle::make('is_aktif')->label('Aktif')->default(true),
         ]);

@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\Pages\ViewUser;
+use App\Models\Prodi;
 use App\Models\Role;
 use App\Models\User;
 use BackedEnum;
@@ -61,7 +62,7 @@ class UserResource extends Resource
             Select::make('roles')->label('Peran')->multiple()->preload()
                 ->relationship('roles', 'name')
                 ->getOptionLabelFromRecordUsing(fn ($record): string => Peran::tryFrom($record->name)?->getLabel() ?? $record->name),
-            Select::make('prodi_id')->label('Program studi')->relationship('prodi', 'nama')->searchable()->preload()
+            Select::make('prodi_id')->label('Program studi')->options(fn (): array => Prodi::opsiAktif())->searchable()
                 ->required(fn (Get $get): bool => Role::whereIn('id', (array) $get('roles'))->where('name', Peran::AdminProdi->value)->exists())
                 ->validationMessages(['required' => 'Program studi wajib diisi untuk peran Admin Prodi.']),
             Toggle::make('is_aktif')->label('Aktif')->default(true)

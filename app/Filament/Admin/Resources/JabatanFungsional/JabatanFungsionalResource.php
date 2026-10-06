@@ -6,6 +6,7 @@ use App\Enums\KelompokJabatan;
 use App\Filament\Admin\Resources\JabatanFungsional\Pages\CreateJabatanFungsional;
 use App\Filament\Admin\Resources\JabatanFungsional\Pages\EditJabatanFungsional;
 use App\Filament\Admin\Resources\JabatanFungsional\Pages\ListJabatanFungsional;
+use App\Models\Golongan;
 use App\Models\JabatanFungsional;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
@@ -56,7 +57,7 @@ class JabatanFungsionalResource extends Resource
             TextInput::make('rumpun')->label('Rumpun')->maxLength(100)->helperText('Untuk tendik, mis. Pranata Komputer atau Pustakawan'),
             TextInput::make('urutan')->label('Urutan jenjang')->numeric()->required(),
             Toggle::make('is_puncak')->label('Jenjang puncak'),
-            Section::make('Syarat kenaikan (sesuai regulasi berlaku)')->description('Isi sesuai aturan jabatan fungsional terbaru; nilai ini dipakai pengingat kenaikan jabatan (BR-11, BR-15). Perlu verifikasi dengan Kemendiktisaintek.')->schema([TextInput::make('masa_kerja_minimal_bulan')->label('Masa kerja minimal (bulan)')->numeric()->minValue(0), TextInput::make('angka_kredit_minimal')->label('Angka kredit minimal')->numeric()->minValue(0), Select::make('golongan_minimal_id')->label('Golongan minimal')->relationship('golonganMinimal', 'kode')->searchable()->preload()])->columns(2)->columnSpanFull(),
+            Section::make('Syarat kenaikan (sesuai regulasi berlaku)')->description('Isi sesuai aturan jabatan fungsional terbaru; nilai ini dipakai pengingat kenaikan jabatan (BR-11, BR-15). Perlu verifikasi dengan Kemendiktisaintek.')->schema([TextInput::make('masa_kerja_minimal_bulan')->label('Masa kerja minimal (bulan)')->numeric()->minValue(0), TextInput::make('angka_kredit_minimal')->label('Angka kredit minimal')->numeric()->minValue(0), Select::make('golongan_minimal_id')->label('Golongan minimal')->options(fn (): array => Golongan::opsiAktif())->searchable()])->columns(2)->columnSpanFull(),
             TextInput::make('dasar_hukum')->label('Dasar hukum')->maxLength(255)->columnSpanFull(),
             Toggle::make('is_aktif')->label('Aktif')->default(true),
         ]);
