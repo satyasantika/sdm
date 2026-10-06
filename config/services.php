@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'enabled' => (bool) env('WHATSAPP_ENABLED', false),
+        'endpoint' => env('WHATSAPP_ENDPOINT'),
+        'token' => env('WHATSAPP_TOKEN'),
+    ],
+
 ];

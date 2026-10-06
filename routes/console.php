@@ -18,3 +18,4 @@ Schedule::command('sdm:bersihkan-tmp')->hourly()->withoutOverlapping()->onOneSer
 Schedule::command('activitylog:clean')->monthlyOn(1, '02:00')->timezone('Asia/Jakarta')->onOneServer();
 Schedule::command('queue:prune-batches')->weekly();
 Schedule::command('queue:prune-failed --hours=720')->weekly();
+Schedule::command('sdm:kirim-pengingat')->dailyAt('07:00')->timezone('Asia/Jakarta')->withoutOverlapping()->onOneServer();
