@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Enums\Peran;
+use App\Models\Aktivitas;
 use App\Models\TokenAkses;
+use App\Policies\AktivitasPolicy;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
 
+        Gate::policy(Aktivitas::class, AktivitasPolicy::class);
         Gate::before(fn ($user) => $user->hasRole(Peran::SuperAdmin->value) ? true : null);
 
         Sanctum::usePersonalAccessTokenModel(TokenAkses::class);

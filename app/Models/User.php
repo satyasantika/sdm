@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Peran;
+use App\Models\Concerns\TercatatAktivitas;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -20,7 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, HasUuids, Notifiable;
+    use HasFactory, HasRoles, HasUuids, Notifiable, TercatatAktivitas;
 
     public function canAccessPanel(Panel $panel): bool
     {
