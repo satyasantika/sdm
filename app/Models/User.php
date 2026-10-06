@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -29,7 +30,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, HasUuids, Notifiable, TercatatAktivitas;
+    use HasApiTokens, HasFactory, HasRoles, HasUuids, Notifiable, TercatatAktivitas;
 
     protected static function booted(): void
     {
@@ -52,8 +53,8 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if (! $this->is_aktif) {
-            return false;
+        if (! $this->is_aktif || $this->hasRole(Peran::KlienApi->value)) {
+            return false; // klien API hanya boleh memakai token, tidak pernah panel
         }
 
         if ($panel->getId() === 'swalayan') {

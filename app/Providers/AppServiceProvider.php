@@ -100,6 +100,7 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::morphMap(self::PETA_MORPH);
 
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->currentAccessToken()?->getKey() ?: $request->ip()));
         RateLimiter::for('buka-tautan', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->getKey() ?: $request->ip()));
 
         Konfigurasi::observe(KonfigurasiObserver::class);

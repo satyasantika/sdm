@@ -9,3 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/health', HealthController::class)->middleware('throttle:30,1');
+
+Route::prefix('v1')->middleware(['auth:sanctum', 'abilities:sdm:read', 'throttle:api'])->group(function () {
+    Route::get('/ping', fn () => response()->json(['pong' => true]));
+});
