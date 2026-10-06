@@ -50,6 +50,7 @@ MD;
                     '5_tahun' => ['min_dtps_doktor' => 2, 'min_dtps_lektor_ke_atas' => 2, 'min_dtps_lektor_kepala_ke_atas' => 1],
                 ],
             ], 'json', 'Peraturan BAN-PT 27/2025 (LAMDIK IAPSK 3.0 Buku 4 Unggul, Sarjana); jenjang lain belum dikonfigurasi'.$verifikasi],
+            ['ambang_rasio_dosen_mahasiswa', '', 'string', 'Ambang rasio mahasiswa per dosen tetap (kosong = tidak ditandai); perlu verifikasi instrumen akreditasi'],
             ['versi_kebijakan_privasi', '2026.1', 'string', 'Versi kebijakan privasi (BR-18)'],
             ['teks_kebijakan_privasi', self::PRIVASI, 'string', 'Draf Markdown pemberitahuan privasi'.$verifikasi],
         ];

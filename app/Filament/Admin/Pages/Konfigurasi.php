@@ -85,6 +85,10 @@ class Konfigurasi extends Page
             Section::make('Syarat unggul LAMDIK')->description('JSON per jenjang. Sumber: Peraturan BAN-PT 27/2025; perlu verifikasi.')->schema([
                 Textarea::make('syarat_unggul_sdm')->label('Syarat unggul (JSON)')->rows(12)->rules(['json'])->columnSpanFull(),
             ]),
+            Section::make('Laporan')->schema([
+                TextInput::make('ambang_rasio_dosen_mahasiswa')->label('Ambang rasio mahasiswa per dosen (opsional)')->numeric()->minValue(1)
+                    ->helperText('Kosongkan bila tidak dipakai. Nilai ideal perlu verifikasi instrumen akreditasi.'),
+            ]),
             Section::make('Privasi')->schema([
                 TextInput::make('versi_kebijakan_privasi')->label('Versi kebijakan privasi')->required()->maxLength(20),
                 MarkdownEditor::make('teks_kebijakan_privasi')->label('Teks kebijakan privasi')->columnSpanFull(),
@@ -114,6 +118,7 @@ class Konfigurasi extends Page
         $data = $this->form->getState();
         $data['syarat_unggul_sdm'] = json_decode((string) $data['syarat_unggul_sdm'], true);
         $data['tahap_pengingat_hari'] = array_map('intval', (array) $data['tahap_pengingat_hari']);
+        $data['ambang_rasio_dosen_mahasiswa'] = filled($data['ambang_rasio_dosen_mahasiswa'] ?? null) ? (string) $data['ambang_rasio_dosen_mahasiswa'] : '';
         foreach (['bup_dosen', 'bup_profesor', 'bup_tendik', 'interval_kp_bulan', 'interval_kgb_bulan', 'cakrawala_pengingat_hari', 'ambang_segera_berakhir_hari', 'interval_periksa_tautan_hari'] as $kunci) {
             $data[$kunci] = (int) $data[$kunci];
         }

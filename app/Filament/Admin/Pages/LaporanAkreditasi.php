@@ -2,13 +2,16 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Actions\Laporan\HitungRasioDosenMahasiswa;
 use App\Actions\Laporan\HitungStatistikDasbor;
 use App\Filament\Exports\BebanKerjaDtpsExporter;
 use App\Filament\Exports\PengembanganKompetensiExporter;
 use App\Filament\Exports\ProfilDosenProdiExporter;
+use App\Filament\Exports\RasioDosenMahasiswaExporter;
 use App\Filament\Exports\RekognisiDtpsExporter;
 use App\Filament\Exports\TenagaKependidikanExporter;
 use App\Models\Prodi;
+use App\Models\Semester;
 use App\Support\BatasEkspor;
 use App\Support\CakupanProdi;
 use BackedEnum;
@@ -23,6 +26,7 @@ use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UnitEnum;
 
@@ -56,6 +60,7 @@ class LaporanAkreditasi extends Page
         $this->form->fill([
             'prodi_id' => CakupanProdi::terkunci(auth()->user()),
             'tanggal' => now()->toDateString(),
+            'semester_id' => Semester::aktifSekarang()?->id,
         ]);
     }
 
@@ -68,10 +73,14 @@ class LaporanAkreditasi extends Page
     {
         return $schema->columns(2)->components([
             Select::make('prodi_id')->label('Program studi')->required()->live()
-                ->options(fn (): array => Prodi::opsiAktif())
+                ->options(fn (): array => ($terkunci = CakupanProdi::terkunci(auth()->user())) !== null
+                    ? array_intersect_key(Prodi::opsiAktif(), [$terkunci => true])
+                    : Prodi::opsiAktif())
                 ->disabled(fn (): bool => CakupanProdi::terkunci(auth()->user()) !== null)
                 ->dehydrated(),
             DatePicker::make('tanggal')->label('Tanggal acuan')->default(now())->live(),
+            Select::make('semester_id')->label('Semester (rasio)')->live()
+                ->options(fn (): array => Semester::query()->orderByDesc('kode')->get()->mapWithKeys(fn (Semester $s): array => [$s->id => $s->label])->all()),
         ]);
     }
 
@@ -86,6 +95,28 @@ class LaporanAkreditasi extends Page
     public function prodiTerpilih(): ?string
     {
         return CakupanProdi::terkunci(auth()->user()) ?? ($this->data['prodi_id'] ?? null);
+    }
+
+    /**
+     * Rasio per prodi untuk semester terpilih (default aktif); admin-prodi hanya baris prodinya.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function rasio(): Collection
+    {
+        $semester = filled($this->data['semester_id'] ?? null) ? Semester::find($this->data['semester_id']) : Semester::aktifSekarang();
+
+        if (! $semester) {
+            return collect();
+        }
+
+        $baris = app(HitungRasioDosenMahasiswa::class)->handle($semester);
+
+        if ($terkunci = CakupanProdi::terkunci(auth()->user())) {
+            $baris = $baris->where('prodi_id', $terkunci)->values();
+        }
+
+        return $baris;
     }
 
     /** @return array<string, mixed>|null */
@@ -124,6 +155,9 @@ class LaporanAkreditasi extends Page
                     ->modifyQueryUsing(fn (Builder $query, array $options): Builder => CakupanProdi::batasi($query, auth()->user())
                         ->whereHas('pegawai', fn (Builder $p) => $p->where('jenis_pegawai', $options['jenis_pegawai'] ?? 'dosen')
                             ->when($prodi(), fn (Builder $q, string $id) => $q->where('prodi_id', $id))))
+                    ->before(BatasEkspor::sebelum()),
+                ExportAction::make('eksporRasio')->exporter(RasioDosenMahasiswaExporter::class)->label('Rasio dosen–mahasiswa')->fileDisk('tmp')
+                    ->modifyQueryUsing(fn (Builder $query): Builder => ($terkunci = CakupanProdi::terkunci(auth()->user())) ? $query->whereKey($terkunci) : $query)
                     ->before(BatasEkspor::sebelum()),
                 ExportAction::make('eksporTendik')->exporter(TenagaKependidikanExporter::class)->label('Tenaga kependidikan')->fileDisk('tmp')
                     ->visible(fn (): bool => CakupanProdi::terkunci(auth()->user()) === null)

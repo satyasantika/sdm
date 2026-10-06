@@ -16,6 +16,7 @@ use App\Models\Ekspor;
 use App\Models\Golongan;
 use App\Models\Impor;
 use App\Models\JabatanFungsional;
+use App\Models\JumlahMahasiswaProdi;
 use App\Models\Konfigurasi;
 use App\Models\Pegawai;
 use App\Models\Pelatihan;
@@ -155,5 +156,7 @@ class AppServiceProvider extends ServiceProvider
         Sertifikasi::saved(fn ($r) => $picu($prodiDari($r->pegawai_id)));
         Sertifikasi::deleted(fn ($r) => $picu($prodiDari($r->pegawai_id)));
         RiwayatStatusPegawai::created(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        JumlahMahasiswaProdi::saved(fn (JumlahMahasiswaProdi $j) => $picu($j->prodi_id));
+        JumlahMahasiswaProdi::deleted(fn (JumlahMahasiswaProdi $j) => $picu($j->prodi_id));
     }
 }
