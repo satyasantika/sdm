@@ -7,6 +7,29 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.3.0] - 2026-10-06
+
+### Ditambahkan
+
+- Master prodi dan unit kerja, kolom `users.prodi_id` (wajib bagi admin-prodi) (F3.1).
+- Master status kepegawaian dan golongan PNS/PPPK dengan penanda KP/KGB/dosen tetap (F3.2).
+- Master jabatan fungsional (syarat kenaikan sebagai data) dan jabatan struktural (F3.3).
+- Master jenjang pendidikan, jenis sertifikasi, jenis dokumen, dan semester (satu semester aktif) (F3.4).
+- Konfigurasi BUP, interval KP/KGB, pengingat, syarat unggul LAMDIK, dan privasi; cache Redis
+  `sdm:konfigurasi` dan `sdm:master:*` (F3.5).
+
+### Perlu verifikasi
+
+Nilai seeder berikut bertanda perlu verifikasi dan harus dicek admin sebelum dipakai produksi:
+
+- Daftar resmi prodi dan kode PDDIKTI (`MasterProdiSeeder`).
+- `pppk` `berlaku_kgb` (`MasterKepegawaianSeeder`).
+- Syarat kenaikan jabatan fungsional (angka kredit, masa kerja, golongan minimal) dibiarkan kosong; dasar hukum
+  Permenpan RB 1/2023 dan aturan turunan Kemendiktisaintek.
+- Nomenklatur jabatan struktural terhadap OTK Unsil.
+- `bup_dosen` 65, `bup_profesor` 70, `bup_tendik` 58, `pembulatan_tmt_pensiun`, `interval_kp_bulan` 48,
+  `interval_kgb_bulan` 24, `syarat_unggul_sdm` (BAN-PT 27/2025, hanya S1), dan `teks_kebijakan_privasi`.
+
 ## [0.2.0] - 2026-10-06
 
 ### Ditambahkan
