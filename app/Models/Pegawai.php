@@ -225,6 +225,11 @@ class Pegawai extends Model
         return $this->hasMany(DokumenPegawai::class)->orderBy('tanggal_kedaluwarsa');
     }
 
+    public function bkd(): HasMany
+    {
+        return $this->hasMany(Bkd::class);
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);
