@@ -233,6 +233,11 @@ return [
                 'tries' => 3,
                 'backoff' => [10, 60, 300],
             ],
+            'supervisor-tautan' => [
+                'queue' => ['tautan'],
+                'maxProcesses' => 1,
+                'timeout' => 30,
+            ],
         ],
 
         'local' => [
@@ -259,6 +264,11 @@ return [
                 'timeout' => 60,
                 'tries' => 3,
                 'backoff' => [10, 60, 300],
+            ],
+            'supervisor-tautan' => [
+                'queue' => ['tautan'],
+                'maxProcesses' => 1,
+                'timeout' => 30,
             ],
         ],
     ],

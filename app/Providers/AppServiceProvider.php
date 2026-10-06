@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Berkas\TautanEksternal;
+use App\Contracts\PenyimpananBerkas;
 use App\Enums\Peran;
 use App\Models\Aktivitas;
 use App\Models\BarisImporGagal;
@@ -10,6 +12,7 @@ use App\Models\Golongan;
 use App\Models\Impor;
 use App\Models\JabatanFungsional;
 use App\Models\Konfigurasi;
+use App\Models\Pegawai;
 use App\Models\Prodi;
 use App\Models\StatusKepegawaian;
 use App\Models\TokenAkses;
@@ -21,20 +24,33 @@ use Carbon\CarbonImmutable;
 use Filament\Actions\Exports\Models\Export;
 use Filament\Actions\Imports\Models\FailedImportRow;
 use Filament\Actions\Imports\Models\Import;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /** Alias morph berbahasa Indonesia (tidak ketat: model lain tetap memakai nama kelas). */
+    private const PETA_MORPH = [
+        'pegawai' => Pegawai::class,
+    ];
+
     /**
      * Register any application services.
      */
     public function register(): void
     {
+        $this->app->bind(PenyimpananBerkas::class, fn () => match (config('berkas.mode')) {
+            default => new TautanEksternal,
+        });
+
         // Model impor/ekspor Filament memakai UUIDv7 (STANDAR-TEKNIS §4a butir 5).
         $this->app->bind(Import::class, Impor::class);
         $this->app->bind(FailedImportRow::class, BarisImporGagal::class);
@@ -51,6 +67,10 @@ class AppServiceProvider extends ServiceProvider
 
         Model::preventLazyLoading(! app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
+
+        Relation::morphMap(self::PETA_MORPH);
+
+        RateLimiter::for('buka-tautan', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->getKey() ?: $request->ip()));
 
         Konfigurasi::observe(KonfigurasiObserver::class);
         foreach ([

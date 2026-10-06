@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -48,3 +49,6 @@ function something()
 {
     // ..
 }
+
+// Tes tidak boleh menembak jaringan nyata (mis. PeriksaTautanBerkas); gunakan Http::fake().
+pest()->beforeEach(fn () => Http::preventStrayRequests())->in('Feature', 'Arch');
