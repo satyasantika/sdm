@@ -14,6 +14,7 @@ use App\Models\JabatanFungsional;
 use App\Models\Konfigurasi;
 use App\Models\Pegawai;
 use App\Models\Prodi;
+use App\Models\RiwayatJabatanFungsional;
 use App\Models\StatusKepegawaian;
 use App\Models\TokenAkses;
 use App\Observers\KonfigurasiObserver;
@@ -40,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
     /** Alias morph berbahasa Indonesia (tidak ketat: model lain tetap memakai nama kelas). */
     private const PETA_MORPH = [
         'pegawai' => Pegawai::class,
+        'riwayat_jabatan_fungsional' => RiwayatJabatanFungsional::class,
     ];
 
     /**

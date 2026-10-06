@@ -2,13 +2,14 @@
 
 namespace App\Policies;
 
-use App\Enums\JenisPegawai;
-use App\Enums\Peran;
 use App\Models\Pegawai;
 use App\Models\User;
+use App\Policies\Concerns\DalamCakupanProdi;
 
 class PegawaiPolicy
 {
+    use DalamCakupanProdi;
+
     public function viewAny(User $user): bool
     {
         return $user->can('pegawai.lihat');
@@ -58,17 +59,5 @@ class PegawaiPolicy
     private function milikSendiri(User $user, Pegawai $pegawai): bool
     {
         return $pegawai->user_id !== null && $pegawai->user_id === $user->getKey();
-    }
-
-    /** BR-03: admin-prodi hanya pegawai prodinya (dosen). */
-    private function dalamCakupan(User $user, Pegawai $pegawai): bool
-    {
-        if (! $user->hasRole(Peran::AdminProdi->value) || $user->hasAnyRole([Peran::SuperAdmin->value, Peran::AdminKepegawaian->value])) {
-            return true;
-        }
-
-        return $user->prodi_id !== null
-            && $pegawai->prodi_id === $user->prodi_id
-            && $pegawai->jenis_pegawai === JenisPegawai::Dosen;
     }
 }

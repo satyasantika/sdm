@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * @property KelompokJabatan $kelompok
+ */
 class JabatanFungsional extends Model
 {
     use HasFactory, HasUuids, SoftDeletes, TercatatAktivitas;

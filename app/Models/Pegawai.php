@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
 
@@ -132,6 +133,16 @@ class Pegawai extends Model
     public function riwayatStatus(): HasMany
     {
         return $this->hasMany(RiwayatStatusPegawai::class)->latest('tmt')->latest('created_at');
+    }
+
+    public function riwayatJabatanFungsional(): HasMany
+    {
+        return $this->hasMany(RiwayatJabatanFungsional::class)->orderByDesc('tmt');
+    }
+
+    public function jabatanFungsionalTerkini(): HasOne
+    {
+        return $this->hasOne(RiwayatJabatanFungsional::class)->where('is_terkini', true);
     }
 
     public function scopeDosen(Builder $query): Builder

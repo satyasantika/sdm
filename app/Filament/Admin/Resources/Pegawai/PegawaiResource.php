@@ -255,6 +255,13 @@ class PegawaiResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\JabatanFungsionalRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
