@@ -1,5 +1,7 @@
 # Sistem Informasi SDM FKIP Universitas Siliwangi
 
+[![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+
 Aplikasi pengelolaan data Sumber Daya Manusia (dosen dan tenaga kependidikan) Fakultas Keguruan dan Ilmu
 Pendidikan Universitas Siliwangi. Satu basis data terpusat memuat data induk pegawai dan riwayat karier
 (jabatan fungsional, pangkat, KGB, pendidikan, sertifikasi) beserta tautan berkas SK di Google Drive, tanpa unggah ke server.
