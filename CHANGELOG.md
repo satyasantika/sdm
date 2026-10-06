@@ -7,6 +7,18 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.2.0] - 2026-10-06
+
+### Ditambahkan
+
+- Filament 5 panel `/admin` (merek "SDM FKIP Unsil", notifikasi database, footer versi) dan kolom
+  `nip`, `nidn`, `no_hp`, `is_aktif`, `last_login_at` pada `users` (F2.1).
+- 7 peran dan 35 izin (spatie/laravel-permission, UUID), enum `Peran`, `Gate::before` super-admin,
+  akses panel per peran (F2.2).
+- Activitylog dengan trait `TercatatAktivitas` (kolom sensitif tanpa nilai) dan halaman Log Audit baca-saja (F2.3).
+- MFA TOTP wajib bagi super-admin dan admin-kepegawaian, pembatas login, kelola pengguna dengan Reset MFA,
+  gerbang Horizon `horizon.lihat` (F2.4).
+
 ## [0.1.0] - 2026-10-06
 
 ### Ditambahkan

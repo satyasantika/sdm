@@ -9,7 +9,7 @@ test('endpoint health mengembalikan status ok dan struktur json benar', function
     $this->getJson('/api/health')
         ->assertOk()
         ->assertJsonStructure(['status', 'aplikasi', 'versi', 'waktu', 'db', 'redis'])
-        ->assertJson(['status' => 'ok', 'db' => true, 'redis' => true, 'versi' => '0.1.0']);
+        ->assertJson(['status' => 'ok', 'db' => true, 'redis' => true, 'versi' => config('app.version')]);
 });
 
 test('endpoint health mengembalikan 503 ketika koneksi db gagal', function () {
