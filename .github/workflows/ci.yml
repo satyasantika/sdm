@@ -58,3 +58,10 @@ jobs:
           DB_CONNECTION: sqlite
           DB_DATABASE: ':memory:'
           REDIS_HOST: 127.0.0.1
+
+      - name: Optimasi produksi (memastikan config/route cache tidak gagal)
+        run: composer produksi
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+          REDIS_HOST: 127.0.0.1
