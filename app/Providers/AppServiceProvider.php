@@ -23,6 +23,7 @@ use App\Models\RiwayatPangkat;
 use App\Models\RiwayatPendidikan;
 use App\Models\Sertifikasi;
 use App\Models\StatusKepegawaian;
+use App\Models\StudiLanjut;
 use App\Models\TokenAkses;
 use App\Observers\KonfigurasiObserver;
 use App\Observers\MasterCacheObserver;
@@ -55,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         'riwayat_pendidikan' => RiwayatPendidikan::class,
         'sertifikasi' => Sertifikasi::class,
         'penghargaan' => Penghargaan::class,
+        'studi_lanjut' => StudiLanjut::class,
         'pelatihan' => Pelatihan::class,
     ];
 

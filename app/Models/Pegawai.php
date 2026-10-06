@@ -213,6 +213,11 @@ class Pegawai extends Model
         return $this->hasMany(Keluarga::class);
     }
 
+    public function studiLanjut(): HasMany
+    {
+        return $this->hasMany(StudiLanjut::class)->orderByDesc('tanggal_mulai');
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);
