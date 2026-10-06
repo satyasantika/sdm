@@ -28,6 +28,10 @@ use Illuminate\Support\Facades\Crypt;
  * @property string|null $user_id
  * @property string|null $prodi_id
  * @property-read User|null $user
+ * @property-read StatusKepegawaian $statusKepegawaian
+ * @property-read Prodi|null $prodi
+ * @property-read JabatanFungsional|null $jabatanFungsional
+ * @property-read Golongan|null $golongan
  * @property string|null $nik
  * @property string|null $npwp
  * @property string|null $nomor_rekening
@@ -143,6 +147,16 @@ class Pegawai extends Model
     public function jabatanFungsionalTerkini(): HasOne
     {
         return $this->hasOne(RiwayatJabatanFungsional::class)->where('is_terkini', true);
+    }
+
+    public function riwayatPangkat(): HasMany
+    {
+        return $this->hasMany(RiwayatPangkat::class)->orderByDesc('tmt');
+    }
+
+    public function riwayatKgb(): HasMany
+    {
+        return $this->hasMany(RiwayatKgb::class)->orderByDesc('tmt');
     }
 
     public function scopeDosen(Builder $query): Builder

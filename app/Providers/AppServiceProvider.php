@@ -15,6 +15,8 @@ use App\Models\Konfigurasi;
 use App\Models\Pegawai;
 use App\Models\Prodi;
 use App\Models\RiwayatJabatanFungsional;
+use App\Models\RiwayatKgb;
+use App\Models\RiwayatPangkat;
 use App\Models\StatusKepegawaian;
 use App\Models\TokenAkses;
 use App\Observers\KonfigurasiObserver;
@@ -42,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
     private const PETA_MORPH = [
         'pegawai' => Pegawai::class,
         'riwayat_jabatan_fungsional' => RiwayatJabatanFungsional::class,
+        'riwayat_pangkat' => RiwayatPangkat::class,
+        'riwayat_kgb' => RiwayatKgb::class,
     ];
 
     /**

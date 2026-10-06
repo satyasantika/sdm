@@ -259,6 +259,8 @@ class PegawaiResource extends Resource
     {
         return [
             RelationManagers\JabatanFungsionalRelationManager::class,
+            RelationManagers\PangkatRelationManager::class,
+            RelationManagers\KgbRelationManager::class,
         ];
     }
 
