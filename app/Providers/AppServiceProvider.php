@@ -7,6 +7,7 @@ use App\Berkas\TautanEksternal;
 use App\Contracts\PenyimpananBerkas;
 use App\Enums\JenisPengingat;
 use App\Enums\Peran;
+use App\Events\DataPegawaiBerubah;
 use App\Events\KonfigurasiKepegawaianDiubah;
 use App\Models\Aktivitas;
 use App\Models\BarisImporGagal;
@@ -26,6 +27,7 @@ use App\Models\RiwayatJabatanStruktural;
 use App\Models\RiwayatKgb;
 use App\Models\RiwayatPangkat;
 use App\Models\RiwayatPendidikan;
+use App\Models\RiwayatStatusPegawai;
 use App\Models\Sertifikasi;
 use App\Models\StatusKepegawaian;
 use App\Models\StudiLanjut;
@@ -129,11 +131,29 @@ class AppServiceProvider extends ServiceProvider
         RiwayatKgb::created(fn (RiwayatKgb $r) => app(SelesaikanPengingat::class)->untukPegawai($r->pegawai_id, [JenisPengingat::Kgb]));
         RiwayatJabatanFungsional::created(fn (RiwayatJabatanFungsional $r) => app(SelesaikanPengingat::class)->untukPegawai($r->pegawai_id, [JenisPengingat::KenaikanJabfung]));
 
+        $this->daftarkanPemicuStatistik();
+
         Gate::policy(Aktivitas::class, AktivitasPolicy::class);
         Gate::before(fn ($user) => $user->hasRole(Peran::SuperAdmin->value) ? true : null);
 
         Sanctum::usePersonalAccessTokenModel(TokenAkses::class);
 
         DB::prohibitDestructiveCommands(app()->isProduction());
+    }
+
+    /** Perubahan data pegawai/riwayat memicu pembersihan cache statistik dasbor. */
+    private function daftarkanPemicuStatistik(): void
+    {
+        $picu = fn (?string $prodiId) => DataPegawaiBerubah::dispatch($prodiId);
+        $prodiDari = fn (?string $pegawaiId): ?string => $pegawaiId ? Pegawai::withTrashed()->whereKey($pegawaiId)->value('prodi_id') : null;
+
+        Pegawai::saved(fn (Pegawai $p) => $picu($p->prodi_id));
+        Pegawai::deleted(fn (Pegawai $p) => $picu($p->prodi_id));
+        RiwayatJabatanFungsional::saved(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        RiwayatPendidikan::saved(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        RiwayatPendidikan::deleted(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        Sertifikasi::saved(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        Sertifikasi::deleted(fn ($r) => $picu($prodiDari($r->pegawai_id)));
+        RiwayatStatusPegawai::created(fn ($r) => $picu($prodiDari($r->pegawai_id)));
     }
 }

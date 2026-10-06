@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SegarkanStatistikDasbor;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -19,3 +20,4 @@ Schedule::command('activitylog:clean')->monthlyOn(1, '02:00')->timezone('Asia/Ja
 Schedule::command('queue:prune-batches')->weekly();
 Schedule::command('queue:prune-failed --hours=720')->weekly();
 Schedule::command('sdm:kirim-pengingat')->dailyAt('07:00')->timezone('Asia/Jakarta')->withoutOverlapping()->onOneServer();
+Schedule::job(new SegarkanStatistikDasbor)->hourly()->onOneServer();

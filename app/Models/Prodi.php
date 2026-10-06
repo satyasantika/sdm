@@ -25,6 +25,11 @@ class Prodi extends Model
         ];
     }
 
+    public function pegawai(): HasMany
+    {
+        return $this->hasMany(Pegawai::class);
+    }
+
     public function unitKerja(): HasMany
     {
         return $this->hasMany(UnitKerja::class);
