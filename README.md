@@ -1,0 +1,33 @@
+# Sistem Informasi SDM FKIP Universitas Siliwangi
+
+Aplikasi pengelolaan data Sumber Daya Manusia (dosen dan tenaga kependidikan) Fakultas Keguruan dan Ilmu
+Pendidikan Universitas Siliwangi. Satu basis data terpusat memuat data induk pegawai dan riwayat karier
+(jabatan fungsional, pangkat, KGB, pendidikan, sertifikasi) beserta tautan berkas SK di Google Drive, tanpa unggah ke server.
+Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi admin, sistem mengingatkan tenggat
+(kenaikan pangkat, KGB, pensiun, dokumen kedaluwarsa), dan menyediakan laporan akreditasi serta API read-only untuk sistem FKIP lain.
+
+## Prasyarat
+
+- PHP 8.4 (minimal 8.3) dengan ekstensi mbstring, intl, pdo_sqlite, zip, gd, bcmath
+- Composer 2
+- Node 22
+- Docker Desktop / WSL2
+- Git
+
+## Dokumentasi
+
+| Berkas | Isi |
+|---|---|
+| [`CLAUDE.md`](CLAUDE.md) | Konteks untuk agen AI |
+| [`docs/01-PRD.md`](docs/01-PRD.md) | Kebutuhan produk, peran, aturan bisnis |
+| [`docs/02-ARSITEKTUR.md`](docs/02-ARSITEKTUR.md) | Stack, paket, Redis, panel, jadwal |
+| [`docs/03-SKEMA-DATABASE.md`](docs/03-SKEMA-DATABASE.md) | ERD dan definisi tabel |
+| [`docs/04-PROMPT-BERTAHAP.md`](docs/04-PROMPT-BERTAHAP.md) | Prompt bertahap fase F0–F10 |
+| [`docs/05-UJI-PENERIMAAN.md`](docs/05-UJI-PENERIMAAN.md) | Skenario UAT dan checklist rilis |
+| [`docs/STANDAR-TEKNIS.md`](docs/STANDAR-TEKNIS.md) | Standar teknis bersama |
+| [`docs/STANDAR-GIT.md`](docs/STANDAR-GIT.md) | Standar commit, branch, tag |
+
+## Cara kontribusi
+
+Ikuti [`docs/STANDAR-GIT.md`](docs/STANDAR-GIT.md): satu langkah = satu commit Conventional Commits yang lolos
+`pint`, `phpstan`, dan `pest`; satu fase = satu branch fitur, Pull Request, lalu tag versi.

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.php diff=php
