@@ -185,6 +185,29 @@ class Pegawai extends Model
         return $this->sertifikasi()->whereHas('jenisSertifikasi', fn (Builder $q) => $q->where('is_serdos', true))->exists();
     }
 
+    public function penghargaan(): HasMany
+    {
+        return $this->hasMany(Penghargaan::class)->orderByDesc('tanggal');
+    }
+
+    public function pelatihan(): HasMany
+    {
+        return $this->hasMany(Pelatihan::class)->orderByDesc('tanggal_mulai');
+    }
+
+    /** @return array<int, int> tahun => total jam pelatihan, terbaru dahulu */
+    public function jamPelatihanPerTahun(): array
+    {
+        $per = [];
+        foreach (Pelatihan::query()->where('pegawai_id', $this->getKey())->get(['tanggal_mulai', 'jumlah_jam']) as $pelatihan) {
+            $tahun = (int) $pelatihan->tanggal_mulai->year;
+            $per[$tahun] = ($per[$tahun] ?? 0) + (int) $pelatihan->jumlah_jam;
+        }
+        krsort($per);
+
+        return $per;
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);

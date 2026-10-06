@@ -13,6 +13,8 @@ use App\Models\Impor;
 use App\Models\JabatanFungsional;
 use App\Models\Konfigurasi;
 use App\Models\Pegawai;
+use App\Models\Pelatihan;
+use App\Models\Penghargaan;
 use App\Models\Prodi;
 use App\Models\RiwayatJabatanFungsional;
 use App\Models\RiwayatJabatanStruktural;
@@ -52,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
         'riwayat_jabatan_struktural' => RiwayatJabatanStruktural::class,
         'riwayat_pendidikan' => RiwayatPendidikan::class,
         'sertifikasi' => Sertifikasi::class,
+        'penghargaan' => Penghargaan::class,
+        'pelatihan' => Pelatihan::class,
     ];
 
     /**
