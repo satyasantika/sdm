@@ -14,7 +14,7 @@ class SuperAdminSeeder extends Seeder
         $password = config('sdm.superadmin.password');
 
         if (! $email || ! $password) {
-            $this->command->warn('SEED_SUPERADMIN_EMAIL/SEED_SUPERADMIN_PASSWORD kosong; super-admin tidak dibuat.');
+            logger()->warning('SEED_SUPERADMIN_EMAIL/SEED_SUPERADMIN_PASSWORD kosong; super-admin tidak dibuat.');
 
             return;
         }

@@ -7,6 +7,18 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.4.0] - 2026-10-06
+
+### Ditambahkan
+
+- Tabel `pegawai` dengan NIK/NPWP/rekening terenkripsi, `nik_hash`, tanggal pensiun otomatis dari konfigurasi,
+  dan status keaktifan dengan riwayat (F4.1).
+- Resource pegawai dengan Policy per record dan scope prodi untuk admin-prodi; form tulis-saja untuk data sensitif (F4.2).
+- Masking NIK/NPWP/rekening, aksi tampil berizin dengan rate limit 10/menit dan log `akses-sensitif` (F4.3).
+- Impor pegawai via antrean `impor` (Filament Importer) dan pembuatan akun swalayan dengan notifikasi atur kata sandi (F4.4).
+- `DemoSeeder` (hanya local/testing): akun per peran dan 40 pegawai fiktif; kata sandi dari `SEED_DEMO_PASSWORD`.
+- Tabel impor/ekspor Filament memakai UUID (lihat `docs/KEPUTUSAN.md`).
+
 ## [0.3.0] - 2026-10-06
 
 ### Ditambahkan

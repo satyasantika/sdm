@@ -17,5 +17,9 @@ class DatabaseSeeder extends Seeder
             PeranDanIzinSeeder::class,
             SuperAdminSeeder::class,
         ]);
+
+        if (app()->environment(['local', 'testing'])) {
+            $this->call(DemoSeeder::class);
+        }
     }
 }
