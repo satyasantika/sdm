@@ -7,6 +7,22 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.6.0] - 2026-10-06
+
+### Ditambahkan
+
+- Usulan perubahan data terenkripsi (`usulan_perubahan`, `riwayat_status_usulan`) dengan registri target berdaftar putih,
+  kunci aktif BR-05, dan transisi status sesuai diagram PRD 7.1 (F6.1).
+- Panel swalayan `/saya` (Beranda, Profil Saya, Usulan Saya) dan persetujuan privasi berversi (F6.2).
+- Formulir pengajuan perubahan biodata/riwayat di swalayan; skema form riwayat dipakai bersama admin dan swalayan (F6.3).
+- Verifikasi usulan di panel admin: lock Redis, deteksi konflik, penerapan ke data target, snapshot tautan BR-33,
+  notifikasi database dan surel, badge antrean, serta tampil data sensitif berizin (F6.4).
+
+### Catatan
+
+- Tautan berkas pada usulan dikonfirmasi pengusul (centang berbagi terbatas); saat disetujui tautan disimpan dengan
+  konfirmasi atas nama pengusul dan dicatat di log audit.
+
 ## [0.5.0] - 2026-10-06
 
 ### Ditambahkan
