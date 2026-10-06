@@ -1,32 +1,21 @@
 <?php
 
-namespace Tests\Feature;
+test('dasbor horizon dapat diakses di lingkungan local', function () {
+    $this->app['env'] = 'local';
 
-use Tests\TestCase;
+    $this->get('/horizon')->assertOk();
+});
 
-class HorizonTest extends TestCase
-{
-    public function test_dasbor_horizon_dapat_diakses_di_lingkungan_local(): void
-    {
-        $this->app['env'] = 'local';
+test('lingkungan local memiliki empat supervisor bernama', function () {
+    $supervisor = config('horizon.environments.local');
 
-        $this->get('/horizon')->assertOk();
-    }
+    expect(array_keys($supervisor))->toBe([
+        'supervisor-default', 'supervisor-impor', 'supervisor-ekspor', 'supervisor-notifikasi',
+    ])
+        ->and($supervisor['supervisor-notifikasi']['queue'])->toBe(['notifikasi'])
+        ->and(config('queue.connections.redis.retry_after'))->toBe(660);
+});
 
-    public function test_lingkungan_local_memiliki_empat_supervisor_bernama(): void
-    {
-        $supervisor = config('horizon.environments.local');
-
-        $this->assertSame(
-            ['supervisor-default', 'supervisor-impor', 'supervisor-ekspor', 'supervisor-notifikasi'],
-            array_keys($supervisor),
-        );
-        $this->assertSame(['notifikasi'], $supervisor['supervisor-notifikasi']['queue']);
-        $this->assertSame(660, config('queue.connections.redis.retry_after'));
-    }
-
-    public function test_snapshot_horizon_terjadwal_setiap_lima_menit(): void
-    {
-        $this->artisan('schedule:list')->expectsOutputToContain('horizon:snapshot')->assertSuccessful();
-    }
-}
+test('snapshot horizon terjadwal setiap lima menit', function () {
+    $this->artisan('schedule:list')->expectsOutputToContain('horizon:snapshot')->assertSuccessful();
+});

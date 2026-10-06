@@ -65,6 +65,17 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | Versi aplikasi yang ditampilkan di endpoint kesehatan dan footer.
+    |
+    */
+
+    'version' => env('APP_VERSION', '0.1.0'),
+
     'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     /*

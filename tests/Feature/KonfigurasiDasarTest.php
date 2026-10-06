@@ -1,36 +1,26 @@
 <?php
 
-namespace Tests\Feature;
-
 use Illuminate\Support\Facades\Validator;
-use Tests\TestCase;
 
-class KonfigurasiDasarTest extends TestCase
-{
-    public function test_zona_waktu_aplikasi_adalah_asia_jakarta(): void
-    {
-        $this->assertSame('Asia/Jakarta', config('app.timezone'));
-        $this->assertSame('Asia/Jakarta', now()->getTimezone()->getName());
-    }
+test('zona waktu aplikasi adalah asia jakarta', function () {
+    expect(config('app.timezone'))->toBe('Asia/Jakarta')
+        ->and(now()->getTimezone()->getName())->toBe('Asia/Jakarta');
+});
 
-    public function test_locale_aplikasi_adalah_indonesia(): void
-    {
-        $this->assertSame('id', app()->getLocale());
-        $this->assertSame('id_ID', config('app.faker_locale'));
-    }
+test('locale aplikasi adalah indonesia', function () {
+    expect(app()->getLocale())->toBe('id')
+        ->and(config('app.faker_locale'))->toBe('id_ID');
+});
 
-    public function test_pesan_validasi_berbahasa_indonesia(): void
-    {
-        $pesan = Validator::make([], ['nama' => 'required'])->errors()->first('nama');
+test('pesan validasi berbahasa indonesia', function () {
+    $pesan = Validator::make([], ['nama' => 'required'])->errors()->first('nama');
 
-        $this->assertSame('Isian nama wajib diisi.', $pesan);
-    }
+    expect($pesan)->toBe('Isian nama wajib diisi.');
+});
 
-    public function test_redis_memakai_database_terpisah_untuk_cache_dan_antrean(): void
-    {
-        $this->assertSame('1', (string) config('database.redis.cache.database'));
-        $this->assertSame('2', (string) config('database.redis.queue.database'));
-        $this->assertSame('queue', config('queue.connections.redis.connection'));
-        $this->assertSame(660, config('queue.connections.redis.retry_after'));
-    }
-}
+test('redis memakai database terpisah untuk cache dan antrean', function () {
+    expect((string) config('database.redis.cache.database'))->toBe('1')
+        ->and((string) config('database.redis.queue.database'))->toBe('2')
+        ->and(config('queue.connections.redis.connection'))->toBe('queue')
+        ->and(config('queue.connections.redis.retry_after'))->toBe(660);
+});
