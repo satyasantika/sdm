@@ -31,3 +31,12 @@ Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi a
 
 Ikuti [`docs/STANDAR-GIT.md`](docs/STANDAR-GIT.md): satu langkah = satu commit Conventional Commits yang lolos
 `pint`, `phpstan`, dan `pest`; satu fase = satu branch fitur, Pull Request, lalu tag versi.
+
+## Setelah klon
+
+```bash
+git config core.hooksPath .githooks   # aktifkan hook commit-msg dan pre-commit
+cp .env.example .env && php artisan key:generate
+```
+
+Basis data memakai SQLite (tanpa MySQL); layanan Sail yang dipakai hanya Redis dan Mailpit.
