@@ -40,3 +40,12 @@ cp .env.example .env && php artisan key:generate
 ```
 
 Basis data memakai SQLite (tanpa MySQL); layanan Sail yang dipakai hanya Redis dan Mailpit.
+
+## Menjalankan antrean
+
+```bash
+./vendor/bin/sail artisan horizon        # worker antrean (default, impor, ekspor, notifikasi)
+./vendor/bin/sail artisan schedule:work  # penjadwal lokal
+```
+
+Dasbor Horizon: `/horizon` (lokal terbuka; dibatasi ke peran `super-admin` pada F2.4).
