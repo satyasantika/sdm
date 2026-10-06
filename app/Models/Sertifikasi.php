@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read JenisSertifikasi $jenisSertifikasi
  * @property CarbonInterface|null $tanggal_kedaluwarsa
  * @property StatusBerlaku $status_berlaku
+ * @property string|null $nomor_registrasi
  */
 class Sertifikasi extends Model
 {

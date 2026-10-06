@@ -6,6 +6,7 @@ use App\Enums\KategoriRekognisi;
 use App\Enums\TingkatKegiatan;
 use App\Models\Concerns\PunyaTautanBerkas;
 use App\Models\Concerns\TercatatAktivitas;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Pegawai $pegawai
  * @property KategoriRekognisi $kategori
  * @property TingkatKegiatan $tingkat
+ * @property CarbonInterface|null $tanggal
  */
 class Penghargaan extends Model
 {

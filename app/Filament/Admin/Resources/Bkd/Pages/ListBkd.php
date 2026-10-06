@@ -7,7 +7,9 @@ use App\Filament\Admin\Widgets\BkdRingkasanWidget;
 use App\Filament\Exports\RekapBkdExporter;
 use App\Filament\Imports\BkdImporter;
 use App\Models\Pegawai;
+use App\Support\BatasEkspor;
 use App\Support\BkdRingkasan;
+use App\Support\CakupanProdi;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ExportAction;
@@ -16,8 +18,8 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\RateLimiter;
 
 class ListBkd extends ListRecords
 {
@@ -46,16 +48,8 @@ class ListBkd extends ListRecords
                 ->label('Ekspor rekap')
                 ->fileDisk('tmp')
                 ->visible(fn (): bool => (bool) auth()->user()?->can('bkd.ekspor'))
-                ->before(function (ExportAction $action): void {
-                    $kunci = 'ekspor:'.auth()->id();
-                    if (RateLimiter::tooManyAttempts($kunci, 5)) {
-                        Notification::make()->warning()->title('Terlalu banyak permintaan ekspor. Coba lagi sebentar.')->send();
-                        $action->halt();
-
-                        return;
-                    }
-                    RateLimiter::hit($kunci, 60);
-                }),
+                ->modifyQueryUsing(fn (Builder $query): Builder => CakupanProdi::batasi($query, auth()->user()))
+                ->before(BatasEkspor::sebelum()),
             Action::make('tanpaData')->label('Dosen tanpa data BKD')->icon(Heroicon::OutlinedExclamationTriangle)->color('warning')
                 ->modalHeading('Dosen tetap tanpa data BKD')->modalSubmitAction(false)->modalCancelActionLabel('Tutup')
                 ->modalContent(function () {

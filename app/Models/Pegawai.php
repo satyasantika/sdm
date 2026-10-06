@@ -14,6 +14,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,9 @@ use Illuminate\Support\Facades\Crypt;
  * @property-read JabatanFungsional|null $jabatanFungsional
  * @property-read Golongan|null $golongan
  * @property-read UnitKerja|null $unitKerja
+ * @property-read Collection<int, Sertifikasi> $sertifikasi
+ * @property-read Collection<int, RiwayatPendidikan> $riwayatPendidikan
+ * @property-read RiwayatJabatanFungsional|null $jabatanFungsionalTerkini
  * @property-read RiwayatPendidikan|null $pendidikanTertinggi
  * @property string|null $nik
  * @property string|null $npwp
