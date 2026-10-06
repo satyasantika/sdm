@@ -79,12 +79,34 @@ class UsulanPerubahan extends Model
 
     public function riwayatStatus(): HasMany
     {
-        return $this->hasMany(RiwayatStatusUsulan::class)->orderBy('created_at');
+        return $this->hasMany(RiwayatStatusUsulan::class)->with('oleh')->orderBy('created_at');
     }
 
     public function labelTarget(): string
     {
         return RegistriTargetUsulan::label($this->target_tabel);
+    }
+
+    /** Record target saat ini (null untuk tambah riwayat atau bila sudah dihapus). */
+    public function targetSaatIni(): ?Model
+    {
+        if ($this->target_id === null) {
+            return null;
+        }
+
+        return RegistriTargetUsulan::model($this->target_tabel)::query()->find($this->target_id);
+    }
+
+    /** Data target berubah sejak usulan diajukan (BR-06). */
+    public function adaKonflik(): bool
+    {
+        $target = $this->targetSaatIni();
+
+        if ($target === null || $this->target_updated_at === null) {
+            return false;
+        }
+
+        return $target->getAttribute('updated_at')?->toDateTimeString() !== $this->target_updated_at->toDateTimeString();
     }
 
     /** Usulan menunggu keputusan verifikator. */

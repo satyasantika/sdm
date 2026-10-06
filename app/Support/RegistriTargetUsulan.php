@@ -265,7 +265,9 @@ class RegistriTargetUsulan
      */
     public static function terapkan(string $tabel, Pegawai $pegawai, array $data, User $oleh, mixed $record): Model
     {
-        $data += ['sumber' => 'usulan'];
+        if (in_array($tabel, ['riwayat_jabatan_fungsional', 'riwayat_pangkat'], true)) {
+            $data += ['sumber' => 'usulan'];
+        }
 
         return match ($tabel) {
             'pegawai' => app(PerbaruiPegawai::class)->handle($pegawai, $data),

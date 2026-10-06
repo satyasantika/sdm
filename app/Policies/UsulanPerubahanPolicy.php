@@ -12,7 +12,7 @@ class UsulanPerubahanPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->canAny(['usulan.lihat', 'usulan.verifikasi', 'usulan.ajukan']);
+        return $user->canAny(['usulan.lihat', 'usulan.verifikasi']);
     }
 
     /** Pemilik, verifikator, atau admin-prodi untuk pegawai prodinya. */
