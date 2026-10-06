@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property-read string $label
+ */
 class Semester extends Model
 {
     use HasFactory, HasUuids, TercatatAktivitas;
