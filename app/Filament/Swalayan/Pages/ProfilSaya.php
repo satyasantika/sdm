@@ -2,6 +2,7 @@
 
 namespace App\Filament\Swalayan\Pages;
 
+use App\Actions\Laporan\CetakProfilPegawai;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
 use App\Filament\Support\AksiTampilSensitif;
@@ -9,6 +10,7 @@ use App\Filament\Swalayan\Support\AksiUsulan;
 use App\Models\Pegawai;
 use App\Support\RegistriTargetUsulan;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -55,6 +57,16 @@ class ProfilSaya extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('cetakProfil')->label('Cetak profil')->icon(Heroicon::OutlinedPrinter)->color('gray')
+                ->action(function () {
+                    $pegawai = $this->getPegawai();
+                    $aksi = app(CetakProfilPegawai::class);
+                    $isi = $aksi->handle(auth()->user(), $pegawai);
+
+                    return response()->streamDownload(function () use ($isi): void {
+                        echo $isi;
+                    }, $aksi->namaBerkas($pegawai), ['Content-Type' => 'application/pdf']);
+                }),
             AksiUsulan::biodata(),
             ActionGroup::make(array_map(
                 fn (string $tabel) => AksiUsulan::tambah($tabel),

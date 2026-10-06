@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BukaTautanController;
+use App\Http\Controllers\UnduhKeluaranController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,3 +18,8 @@ Route::get('/tautan/{tautanBerkas}/buka', BukaTautanController::class)
     ->middleware(['auth', 'throttle:buka-tautan'])
     ->whereUuid('tautanBerkas')
     ->name('tautan.buka');
+
+Route::get('/keluaran/{id}', UnduhKeluaranController::class)
+    ->middleware(['auth', 'throttle:buka-tautan'])
+    ->whereUuid('id')
+    ->name('keluaran.unduh');
