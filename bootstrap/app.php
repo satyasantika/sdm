@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\HeaderKeamanan;
 use App\Http\Middleware\TambahVersiApi;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
+        $middleware->append(HeaderKeamanan::class);
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'api.versi' => TambahVersiApi::class,
