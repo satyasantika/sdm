@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Actions\Pengingat\SelesaikanPengingat;
 use App\Berkas\TautanEksternal;
 use App\Contracts\PenyimpananBerkas;
+use App\Enums\JenisPengingat;
 use App\Enums\Peran;
+use App\Events\KonfigurasiKepegawaianDiubah;
 use App\Models\Aktivitas;
 use App\Models\BarisImporGagal;
 use App\Models\DokumenPegawai;
@@ -106,6 +109,23 @@ class AppServiceProvider extends ServiceProvider
             $model::deleted($lupakan);
             $model::restored($lupakan);
         }
+
+        // BR-28: perubahan master syarat jabatan/status memicu hitung ulang pengingat dan pensiun.
+        JabatanFungsional::saved(function (JabatanFungsional $jabatan): void {
+            if ($jabatan->wasChanged(['masa_kerja_minimal_bulan', 'is_puncak', 'urutan', 'is_aktif'])) {
+                KonfigurasiKepegawaianDiubah::dispatch(['jabatan_fungsional']);
+            }
+        });
+        StatusKepegawaian::saved(function (StatusKepegawaian $status): void {
+            if ($status->wasChanged(['berlaku_kenaikan_pangkat', 'berlaku_kgb', 'dihitung_dosen_tetap'])) {
+                KonfigurasiKepegawaianDiubah::dispatch(['status_kepegawaian']);
+            }
+        });
+
+        // Riwayat baru menutup pengingat lama untuk jenis terkait.
+        RiwayatPangkat::created(fn (RiwayatPangkat $r) => app(SelesaikanPengingat::class)->untukPegawai($r->pegawai_id, [JenisPengingat::KenaikanPangkat, JenisPengingat::Kgb]));
+        RiwayatKgb::created(fn (RiwayatKgb $r) => app(SelesaikanPengingat::class)->untukPegawai($r->pegawai_id, [JenisPengingat::Kgb]));
+        RiwayatJabatanFungsional::created(fn (RiwayatJabatanFungsional $r) => app(SelesaikanPengingat::class)->untukPegawai($r->pegawai_id, [JenisPengingat::KenaikanJabfung]));
 
         Gate::policy(Aktivitas::class, AktivitasPolicy::class);
         Gate::before(fn ($user) => $user->hasRole(Peran::SuperAdmin->value) ? true : null);

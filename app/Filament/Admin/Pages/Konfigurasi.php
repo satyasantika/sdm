@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Pages;
 
-use App\Events\KonfigurasiKepegawaianDiubah;
 use App\Support\Konfigurasi as Pengaturan;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -27,11 +26,6 @@ use UnitEnum;
  */
 class Konfigurasi extends Page
 {
-    /** Kunci yang bila berubah memicu hitung ulang pengingat & pensiun (BR-28). */
-    private const KUNCI_MEMICU_HITUNG_ULANG = [
-        'bup_dosen', 'bup_profesor', 'bup_tendik', 'pembulatan_tmt_pensiun', 'interval_kp_bulan', 'interval_kgb_bulan',
-    ];
-
     protected string $view = 'filament.admin.pages.konfigurasi';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
@@ -124,17 +118,11 @@ class Konfigurasi extends Page
             $data[$kunci] = (int) $data[$kunci];
         }
 
-        $berubah = [];
+        // Event KonfigurasiKepegawaianDiubah dikirim oleh KonfigurasiObserver untuk kunci yang berpengaruh (BR-28).
         foreach ($data as $kunci => $nilai) {
             if (Pengaturan::get($kunci) !== $nilai) {
                 Pengaturan::set($kunci, $nilai, auth()->user());
-                $berubah[] = $kunci;
             }
-        }
-
-        $memicu = array_values(array_intersect($berubah, self::KUNCI_MEMICU_HITUNG_ULANG));
-        if ($memicu !== []) {
-            KonfigurasiKepegawaianDiubah::dispatch($memicu);
         }
 
         Notification::make()->title('Konfigurasi disimpan')->success()->send();
