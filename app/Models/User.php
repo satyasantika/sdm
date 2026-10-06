@@ -15,12 +15,14 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property array<int, string>|null $app_authentication_recovery_codes
+ * @property-read Pegawai|null $pegawai
  */
 #[Fillable(['name', 'email', 'password', 'nip', 'nidn', 'prodi_id', 'no_hp', 'is_aktif'])]
 #[Hidden(['password', 'remember_token', 'app_authentication_secret', 'app_authentication_recovery_codes'])]
@@ -36,6 +38,11 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
                 throw new \LogicException('Pengguna tidak dapat menghapus akunnya sendiri.');
             }
         });
+    }
+
+    public function pegawai(): HasOne
+    {
+        return $this->hasOne(Pegawai::class);
     }
 
     public function prodi(): BelongsTo

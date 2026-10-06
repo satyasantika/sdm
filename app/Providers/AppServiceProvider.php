@@ -25,6 +25,7 @@ use App\Models\Sertifikasi;
 use App\Models\StatusKepegawaian;
 use App\Models\StudiLanjut;
 use App\Models\TokenAkses;
+use App\Models\UsulanPerubahan;
 use App\Observers\KonfigurasiObserver;
 use App\Observers\MasterCacheObserver;
 use App\Policies\AktivitasPolicy;
@@ -57,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         'sertifikasi' => Sertifikasi::class,
         'penghargaan' => Penghargaan::class,
         'studi_lanjut' => StudiLanjut::class,
+        'usulan_perubahan' => UsulanPerubahan::class,
         'pelatihan' => Pelatihan::class,
     ];
 
