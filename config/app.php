@@ -74,7 +74,7 @@ return [
     |
     */
 
-    'version' => env('APP_VERSION', '0.7.0'),
+    'version' => env('APP_VERSION', '0.8.0'),
 
     'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 

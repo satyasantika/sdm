@@ -51,3 +51,23 @@ Basis data memakai SQLite (tanpa MySQL); layanan Sail yang dipakai hanya Redis d
 ```
 
 Dasbor Horizon: `/horizon` (lokal terbuka; dibatasi ke peran `super-admin` pada F2.4).
+
+## Penjadwal
+
+Semua jadwal memakai zona waktu `Asia/Jakarta` dan `onOneServer()`. Jalankan lokal dengan:
+
+```bash
+./vendor/bin/sail artisan schedule:work   # produksi: container scheduler menjalankan schedule:work
+```
+
+| Jadwal | Perintah | Fungsi |
+|---|---|---|
+| Harian 00:30 | `sdm:tandai-kedaluwarsa` | Status berlaku dokumen & sertifikasi, pengingat lewat tempo (BR-20) |
+| Harian 01:00 | `sdm:hitung-pengingat` | Hitung ulang pengingat KP/KGB/jabfung/pensiun/dokumen/sertifikasi/studi |
+| Harian 07:00 | `sdm:kirim-pengingat` | Kirim pengingat bertahap H-90/H-30/H-7 (BR-19) |
+| Senin 03:00 | `sdm:periksa-tautan` | Periksa keteraksesan tautan berkas, sensitif lebih dahulu (BR-29) |
+| Setiap jam | `sdm:bersihkan-tmp` | Hapus berkas keluaran sementara > 24 jam (BR-24) |
+| Bulanan, tgl 1 02:00 | `activitylog:clean` | Bersihkan log audit sesuai retensi |
+| Mingguan | `queue:prune-batches`, `queue:prune-failed` | Kebersihan tabel antrean |
+
+Pengiriman WhatsApp bersifat opsional: set `WHATSAPP_ENABLED=true`, `WHATSAPP_ENDPOINT`, dan `WHATSAPP_TOKEN` di `.env`.

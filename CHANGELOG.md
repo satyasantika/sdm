@@ -7,6 +7,19 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.8.0] - 2026-10-06
+
+### Ditambahkan
+
+- Pengingat tenggat KP, KGB, kenaikan jabatan fungsional, pensiun, dokumen, sertifikasi, dan studi lanjut berbasis
+  konfigurasi/master; hitung ulang otomatis saat konfigurasi atau master berubah (BR-28) (F8.1).
+- Jadwal harian (WIB), halaman Pengingat dengan aksi status berizin, ekspor LAP-06, dan bagian Pengingat Saya di swalayan (F8.2).
+- Notifikasi pengingat bertahap idempoten (database, surel, WhatsApp opsional) dan ringkasan harian untuk admin (F8.3).
+
+### Catatan
+
+- Kolom bertipe `date` pada model memakai cast `date` (disimpan sebagai datetime); pencarian idempoten memakai `whereDate`.
+
 ## [0.7.0] - 2026-10-06
 
 ### Ditambahkan
