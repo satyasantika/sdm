@@ -164,6 +164,16 @@ class Pegawai extends Model
         return $this->hasMany(RiwayatJabatanStruktural::class)->orderByDesc('tmt_mulai');
     }
 
+    public function riwayatPendidikan(): HasMany
+    {
+        return $this->hasMany(RiwayatPendidikan::class)->orderByDesc('tahun_lulus');
+    }
+
+    public function pendidikanTertinggi(): HasOne
+    {
+        return $this->hasOne(RiwayatPendidikan::class)->where('is_pendidikan_tertinggi', true);
+    }
+
     public function scopeDosen(Builder $query): Builder
     {
         return $query->where('jenis_pegawai', JenisPegawai::Dosen);

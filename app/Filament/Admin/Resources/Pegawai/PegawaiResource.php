@@ -262,6 +262,7 @@ class PegawaiResource extends Resource
             RelationManagers\PangkatRelationManager::class,
             RelationManagers\KgbRelationManager::class,
             RelationManagers\StrukturalRelationManager::class,
+            RelationManagers\PendidikanRelationManager::class,
         ];
     }
 
