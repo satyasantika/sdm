@@ -4,7 +4,10 @@ namespace App\Providers;
 
 use App\Enums\Peran;
 use App\Models\Aktivitas;
+use App\Models\BarisImporGagal;
+use App\Models\Ekspor;
 use App\Models\Golongan;
+use App\Models\Impor;
 use App\Models\JabatanFungsional;
 use App\Models\Konfigurasi;
 use App\Models\Prodi;
@@ -15,6 +18,9 @@ use App\Observers\MasterCacheObserver;
 use App\Policies\AktivitasPolicy;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Filament\Actions\Exports\Models\Export;
+use Filament\Actions\Imports\Models\FailedImportRow;
+use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +35,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Model impor/ekspor Filament memakai UUIDv7 (STANDAR-TEKNIS §4a butir 5).
+        $this->app->bind(Import::class, Impor::class);
+        $this->app->bind(FailedImportRow::class, BarisImporGagal::class);
+        $this->app->bind(Export::class, Ekspor::class);
     }
 
     /**

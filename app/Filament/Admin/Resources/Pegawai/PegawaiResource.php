@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Pegawai;
 
+use App\Actions\Pegawai\BuatAkunPegawai;
 use App\Actions\Pegawai\TampilkanDataSensitif;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisPegawai;
@@ -19,6 +20,7 @@ use App\Models\UnitKerja;
 use App\Rules\NikBelumTerdaftar;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -26,6 +28,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -39,8 +42,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use UnitEnum;
 
 class PegawaiResource extends Resource
@@ -223,7 +228,31 @@ class PegawaiResource extends Resource
                 Filter::make('pensiun_5_tahun')->label('Pensiun ≤ 5 tahun')
                     ->query(fn (Builder $query): Builder => $query->whereBetween('tanggal_pensiun', [now()->toDateString(), now()->addYears(5)->toDateString()])),
             ])
-            ->recordActions([ViewAction::make(), EditAction::make()]);
+            ->recordActions([ViewAction::make(), EditAction::make()])
+            ->toolbarActions([
+                BulkAction::make('buatAkun')->label('Buat akun swalayan')->icon(Heroicon::OutlinedUserPlus)
+                    ->requiresConfirmation()
+                    ->visible(fn (): bool => (bool) auth()->user()?->canAny(['pengguna.kelola', 'pegawai.impor']))
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (Collection $records): void {
+                        $berhasil = 0;
+                        $gagal = [];
+                        foreach ($records as $pegawai) {
+                            try {
+                                app(BuatAkunPegawai::class)->handle($pegawai);
+                                $berhasil++;
+                            } catch (ValidationException $e) {
+                                $gagal[] = collect($e->errors())->flatten()->first();
+                            }
+                        }
+
+                        Notification::make()
+                            ->title("{$berhasil} akun dibuat".($gagal ? ', '.count($gagal).' dilewati' : ''))
+                            ->body($gagal ? implode("\n", $gagal) : null)
+                            ->color($gagal ? 'warning' : 'success')
+                            ->send();
+                    }),
+            ]);
     }
 
     public static function getPages(): array

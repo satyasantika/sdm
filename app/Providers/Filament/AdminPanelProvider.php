@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->passwordReset()
             ->brandName('SDM FKIP Unsil')
             ->profile()
             ->multiFactorAuthentication([AppAuthentication::make()->recoverable()])
