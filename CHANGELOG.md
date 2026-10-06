@@ -7,6 +7,20 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+## [0.7.0] - 2026-10-06
+
+### Ditambahkan
+
+- Dokumen kepegawaian dengan masa berlaku, kebijakan akses dokumen identitas, resource lintas pegawai,
+  `DokumenKedaluwarsaWidget`, dan tab Dokumen di swalayan (F7.1).
+- Impor rekap BKD dari Excel/CSV SISTER via antrean `impor` dengan lock per semester dan ringkasan di log audit (F7.2).
+- Rekap BKD per semester/prodi, input manual, ekspor tanpa data sensitif (disk `tmp`), dan halaman BKD Saya (F7.3).
+- Dokumentasi pemetaan kolom impor BKD: `docs/PEMETAAN-KOLOM-BKD.md`.
+
+### Diperbaiki
+
+- `MasterPendukungSeeder` tidak lagi memakai variabel `static` untuk urutan jenjang (urutan bergeser saat seeder dijalankan ulang).
+
 ## [0.6.0] - 2026-10-06
 
 ### Ditambahkan
