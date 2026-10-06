@@ -9,3 +9,12 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+
+// Jadwal harian SDM (zona waktu Asia/Jakarta). Jalankan lokal: php artisan schedule:work.
+Schedule::command('sdm:tandai-kedaluwarsa')->dailyAt('00:30')->timezone('Asia/Jakarta')->withoutOverlapping()->onOneServer();
+Schedule::command('sdm:hitung-pengingat')->dailyAt('01:00')->timezone('Asia/Jakarta')->withoutOverlapping()->onOneServer();
+Schedule::command('sdm:periksa-tautan')->weeklyOn(1, '03:00')->timezone('Asia/Jakarta')->withoutOverlapping()->onOneServer();
+Schedule::command('sdm:bersihkan-tmp')->hourly()->withoutOverlapping()->onOneServer();
+Schedule::command('activitylog:clean')->monthlyOn(1, '02:00')->timezone('Asia/Jakarta')->onOneServer();
+Schedule::command('queue:prune-batches')->weekly();
+Schedule::command('queue:prune-failed --hours=720')->weekly();

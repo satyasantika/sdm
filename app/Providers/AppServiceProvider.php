@@ -19,6 +19,7 @@ use App\Models\Konfigurasi;
 use App\Models\Pegawai;
 use App\Models\Pelatihan;
 use App\Models\Penghargaan;
+use App\Models\Pengingat;
 use App\Models\Prodi;
 use App\Models\RiwayatJabatanFungsional;
 use App\Models\RiwayatJabatanStruktural;
@@ -64,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
         'studi_lanjut' => StudiLanjut::class,
         'usulan_perubahan' => UsulanPerubahan::class,
         'dokumen_pegawai' => DokumenPegawai::class,
+        'pengingat' => Pengingat::class,
         'pelatihan' => Pelatihan::class,
     ];
 

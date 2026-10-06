@@ -2,7 +2,9 @@
 
 namespace App\Filament\Swalayan\Pages;
 
+use App\Enums\StatusPengingat;
 use App\Models\Pegawai;
+use App\Models\Pengingat;
 use App\Models\UsulanPerubahan;
 use Filament\Pages\Dashboard;
 use Illuminate\Support\Collection;
@@ -37,6 +39,16 @@ class Beranda extends Dashboard
             'Pendidikan tertinggi' => $p->pendidikanTertinggi->jenjangPendidikan->nama ?? '-',
             'Tanggal pensiun' => $p->tanggal_pensiun?->translatedFormat('d F Y') ?? '-',
         ];
+    }
+
+    /** @return Collection<int, Pengingat> pengingat aktif/lewat tempo milik sendiri */
+    public function pengingatSaya(): Collection
+    {
+        return Pengingat::query()
+            ->whereHas('pegawai', fn ($q) => $q->where('user_id', auth()->id()))
+            ->whereIn('status', [StatusPengingat::Aktif->value, StatusPengingat::LewatTempo->value])
+            ->orderBy('tanggal_jatuh_tempo')
+            ->get();
     }
 
     /** @return Collection<int, UsulanPerubahan> */
