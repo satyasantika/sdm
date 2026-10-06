@@ -3,18 +3,14 @@
 namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 
 use App\Actions\Riwayat\SimpanPelatihan;
-use App\Enums\JenisPelatihan;
 use App\Enums\JenisTautan;
-use App\Enums\TingkatKegiatan;
 use App\Filament\Forms\TautanBerkasField;
+use App\Filament\Schemas\PelatihanForm;
 use App\Models\Pegawai;
 use App\Models\Pelatihan;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -31,16 +27,10 @@ class PelatihanRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            TextInput::make('nama')->label('Nama')->required()->maxLength(200),
-            Select::make('jenis')->label('Jenis')->options(JenisPelatihan::class)->required(),
-            TextInput::make('penyelenggara')->label('Penyelenggara')->maxLength(150),
-            Select::make('tingkat')->label('Tingkat')->options(TingkatKegiatan::class),
-            DatePicker::make('tanggal_mulai')->label('Tanggal mulai')->required(),
-            DatePicker::make('tanggal_selesai')->label('Tanggal selesai'),
-            TextInput::make('jumlah_jam')->label('Jumlah jam')->numeric()->minValue(1)->maxValue(2000),
-            TautanBerkasField::make('pelatihan', JenisTautan::Pelatihan, 'Tautan bukti')->columnSpanFull(),
-        ]);
+        /** @var Pegawai $pegawai */
+        $pegawai = $this->getOwnerRecord();
+
+        return $schema->components(PelatihanForm::components($pegawai));
     }
 
     public function table(Table $table): Table

@@ -5,14 +5,12 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 use App\Actions\Riwayat\SimpanRiwayatPendidikan;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
-use App\Models\JenjangPendidikan;
+use App\Filament\Schemas\PendidikanForm;
 use App\Models\Pegawai;
 use App\Models\RiwayatPendidikan;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -30,22 +28,10 @@ class PendidikanRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Select::make('jenjang_pendidikan_id')->label('Jenjang')->required()
-                ->options(fn (): array => JenjangPendidikan::query()->orderBy('urutan')->pluck('nama', 'id')->all()),
-            TextInput::make('nama_pt')->label('Perguruan tinggi')->required()->maxLength(150),
-            TextInput::make('negara')->label('Negara')->default('Indonesia')->maxLength(60),
-            TextInput::make('nama_prodi')->label('Program studi')->maxLength(150),
-            TextInput::make('bidang_ilmu')->label('Bidang ilmu')->maxLength(150),
-            TextInput::make('gelar')->label('Gelar')->maxLength(30),
-            TextInput::make('tahun_masuk')->label('Tahun masuk')->numeric()->minValue(1950)->maxValue((int) now()->year),
-            TextInput::make('tahun_lulus')->label('Tahun lulus')->numeric()->minValue(1950)->maxValue((int) now()->year),
-            TextInput::make('nomor_ijazah')->label('Nomor ijazah')->maxLength(100),
-            TextInput::make('ipk')->label('IPK')->numeric()->minValue(0)->maxValue(4)->step('0.01'),
-            TextInput::make('judul_tugas_akhir')->label('Judul tugas akhir')->maxLength(500)->columnSpanFull(),
-            TautanBerkasField::make('ijazah', JenisTautan::Ijazah, 'Tautan ijazah')->columnSpanFull(),
-            TautanBerkasField::make('transkrip', JenisTautan::Transkrip, 'Tautan transkrip')->columnSpanFull(),
-        ]);
+        /** @var Pegawai $pegawai */
+        $pegawai = $this->getOwnerRecord();
+
+        return $schema->components(PendidikanForm::components($pegawai));
     }
 
     public function table(Table $table): Table

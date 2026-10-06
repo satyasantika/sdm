@@ -53,11 +53,11 @@ class BuatUsulanPerubahan
 
         $target = $this->targetMilikPegawai($pegawai, $jenis, $targetTabel, $targetId);
         $tautan = $this->tautanTarget($dataBaru);
-        $lama = $target ? $this->snapshot($targetTabel, $target) : null;
+        $lama = $target ? RegistriTargetUsulan::snapshot($targetTabel, $target) : null;
 
         $baru = null;
         if ($jenis !== JenisUsulan::HapusRiwayat) {
-            $baru = $this->dataBaru($targetTabel, $jenis, RegistriTargetUsulan::saring($targetTabel, $dataBaru), $lama);
+            $baru = $this->siapkanDataBaru($targetTabel, $jenis, RegistriTargetUsulan::saring($targetTabel, $dataBaru), $lama);
             if ($tautan !== []) {
                 $baru['tautan'] = $tautan;
             }
@@ -128,7 +128,7 @@ class BuatUsulanPerubahan
      * @param  array<string, mixed>  $dataBaru
      * @return array<string, string>
      */
-    private function tautanTarget(array $dataBaru): array
+    public function tautanTarget(array $dataBaru): array
     {
         $tautan = [];
 
@@ -149,8 +149,15 @@ class BuatUsulanPerubahan
      * @param  array<string, mixed>|null  $lama
      * @return array<string, mixed>
      */
-    private function dataBaru(string $tabel, JenisUsulan $jenis, array $data, ?array $lama): array
+    public function siapkanDataBaru(string $tabel, JenisUsulan $jenis, array $data, ?array $lama): array
     {
+        // Kolom sensitif yang dikosongkan berarti "tidak diubah" (kolom tulis-saja).
+        foreach (RegistriTargetUsulan::kolomSensitif($tabel) as $kolom) {
+            if (blank($data[$kolom] ?? null)) {
+                unset($data[$kolom]);
+            }
+        }
+
         $data = array_map(fn ($v) => $v instanceof BackedEnum ? $v->value : ($v instanceof DateTimeInterface ? $v->format('Y-m-d') : $v), $data);
 
         // Biodata: hanya kolom yang benar-benar berubah yang diusulkan.
@@ -175,19 +182,6 @@ class BuatUsulanPerubahan
         }
 
         return $jenis === JenisUsulan::UbahRiwayat ? $lengkap : $data;
-    }
-
-    /** @return array<string, mixed> */
-    private function snapshot(string $tabel, Model $target): array
-    {
-        $snapshot = [];
-
-        foreach (RegistriTargetUsulan::kolomBoleh($tabel) as $kolom) {
-            $nilai = $target->getAttribute($kolom);
-            $snapshot[$kolom] = $nilai instanceof BackedEnum ? $nilai->value : ($nilai instanceof DateTimeInterface ? $nilai->format('Y-m-d') : $nilai);
-        }
-
-        return $snapshot;
     }
 
     /**

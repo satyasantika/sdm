@@ -222,6 +222,29 @@ class RegistriTargetUsulan
     }
 
     /**
+     * Snapshot kolom daftar putih dari record target (enum → nilai, tanggal → Y-m-d).
+     *
+     * @return array<string, mixed>
+     */
+    public static function snapshot(string $tabel, Model $target): array
+    {
+        $snapshot = [];
+
+        foreach (self::kolomBoleh($tabel) as $kolom) {
+            $nilai = $target->getAttribute($kolom);
+            $snapshot[$kolom] = $nilai instanceof \BackedEnum ? $nilai->value : ($nilai instanceof \DateTimeInterface ? $nilai->format('Y-m-d') : $nilai);
+        }
+
+        return $snapshot;
+    }
+
+    /** Label kolom untuk tampilan diff. */
+    public static function labelKolom(string $kolom): string
+    {
+        return ucfirst(str_replace(['_id', '_'], ['', ' '], $kolom));
+    }
+
+    /**
      * Kolom sensitif yang ditampilkan tersamar di diff.
      *
      * @return list<string>

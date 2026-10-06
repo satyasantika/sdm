@@ -4,18 +4,14 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 
 use App\Actions\Riwayat\HapusRiwayatPangkat;
 use App\Actions\Riwayat\SimpanRiwayatPangkat;
-use App\Enums\JenisKenaikanPangkat;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
-use App\Models\Golongan;
+use App\Filament\Schemas\PangkatForm;
 use App\Models\Pegawai;
 use App\Models\RiwayatPangkat;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -35,21 +31,8 @@ class PangkatRelationManager extends RelationManager
     {
         /** @var Pegawai $pegawai */
         $pegawai = $this->getOwnerRecord();
-        $jenis = $pegawai->statusKepegawaian->jenis_golongan;
 
-        return $schema->components([
-            Select::make('golongan_id')->label('Golongan')->required()->searchable()
-                ->options(fn (): array => Golongan::query()->aktif()->urut()
-                    ->when($jenis, fn ($q) => $q->where('jenis', $jenis->value))
-                    ->get()->mapWithKeys(fn (Golongan $g): array => [$g->id => $g->label])->all()),
-            DatePicker::make('tmt')->label('TMT')->required(),
-            Select::make('jenis_kenaikan')->label('Jenis kenaikan')->options(JenisKenaikanPangkat::class)->required(),
-            TextInput::make('nomor_sk')->label('Nomor SK')->required()->maxLength(100),
-            DatePicker::make('tanggal_sk')->label('Tanggal SK'),
-            TextInput::make('masa_kerja_tahun')->label('Masa kerja (tahun)')->numeric()->minValue(0)->maxValue(60),
-            TextInput::make('masa_kerja_bulan')->label('Masa kerja (bulan)')->numeric()->minValue(0)->maxValue(11),
-            TautanBerkasField::make('sk', JenisTautan::Sk, 'Tautan berkas SK')->columnSpanFull(),
-        ]);
+        return $schema->components(PangkatForm::components($pegawai));
     }
 
     public function table(Table $table): Table

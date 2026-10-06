@@ -5,16 +5,12 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 use App\Actions\Riwayat\SimpanRiwayatJabatanStruktural;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
-use App\Models\JenisJabatanStruktural;
+use App\Filament\Schemas\StrukturalForm;
 use App\Models\Pegawai;
 use App\Models\RiwayatJabatanStruktural;
-use App\Models\UnitKerja;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -33,17 +29,10 @@ class StrukturalRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Select::make('jenis_jabatan_struktural_id')->label('Jabatan')->required()->searchable()
-                ->options(fn (): array => JenisJabatanStruktural::query()->where('is_aktif', true)->orderBy('urutan')->pluck('nama', 'id')->all()),
-            Select::make('unit_kerja_id')->label('Unit kerja')->searchable()
-                ->options(fn (): array => UnitKerja::query()->where('is_aktif', true)->orderBy('nama')->pluck('nama', 'id')->all()),
-            DatePicker::make('tmt_mulai')->label('TMT mulai')->required(),
-            DatePicker::make('tmt_selesai')->label('TMT selesai')->helperText('Kosongkan bila masih menjabat'),
-            TextInput::make('nomor_sk')->label('Nomor SK')->required()->maxLength(100),
-            DatePicker::make('tanggal_sk')->label('Tanggal SK'),
-            TautanBerkasField::make('sk', JenisTautan::Sk, 'Tautan berkas SK')->columnSpanFull(),
-        ]);
+        /** @var Pegawai $pegawai */
+        $pegawai = $this->getOwnerRecord();
+
+        return $schema->components(StrukturalForm::components($pegawai));
     }
 
     public function table(Table $table): Table

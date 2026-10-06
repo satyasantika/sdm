@@ -5,15 +5,12 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 use App\Actions\Riwayat\SimpanRiwayatKgb;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
-use App\Models\Golongan;
+use App\Filament\Schemas\KgbForm;
 use App\Models\Pegawai;
 use App\Models\RiwayatKgb;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -33,21 +30,8 @@ class KgbRelationManager extends RelationManager
     {
         /** @var Pegawai $pegawai */
         $pegawai = $this->getOwnerRecord();
-        $jenis = $pegawai->statusKepegawaian->jenis_golongan;
 
-        return $schema->components([
-            DatePicker::make('tmt')->label('TMT')->required(),
-            Select::make('golongan_id')->label('Golongan')->searchable()
-                ->options(fn (): array => Golongan::query()->aktif()->urut()
-                    ->when($jenis, fn ($q) => $q->where('jenis', $jenis->value))
-                    ->get()->mapWithKeys(fn (Golongan $g): array => [$g->id => $g->label])->all()),
-            TextInput::make('gaji_pokok')->label('Gaji pokok (Rp)')->numeric()->minValue(0)->step('0.01'),
-            TextInput::make('nomor_sk')->label('Nomor SK')->required()->maxLength(100),
-            DatePicker::make('tanggal_sk')->label('Tanggal SK'),
-            TextInput::make('masa_kerja_tahun')->label('Masa kerja (tahun)')->numeric()->minValue(0)->maxValue(60),
-            TextInput::make('masa_kerja_bulan')->label('Masa kerja (bulan)')->numeric()->minValue(0)->maxValue(11),
-            TautanBerkasField::make('sk', JenisTautan::Sk, 'Tautan berkas SK KGB')->columnSpanFull(),
-        ]);
+        return $schema->components(KgbForm::components($pegawai));
     }
 
     public function table(Table $table): Table

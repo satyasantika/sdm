@@ -4,17 +4,13 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 
 use App\Actions\Riwayat\SimpanPenghargaan;
 use App\Enums\JenisTautan;
-use App\Enums\KategoriRekognisi;
-use App\Enums\TingkatKegiatan;
 use App\Filament\Forms\TautanBerkasField;
+use App\Filament\Schemas\PenghargaanForm;
 use App\Models\Pegawai;
 use App\Models\Penghargaan;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -31,15 +27,10 @@ class PenghargaanRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Select::make('kategori')->label('Kategori')->options(KategoriRekognisi::class)->required()->default(KategoriRekognisi::Penghargaan->value),
-            TextInput::make('nama')->label('Nama')->required()->maxLength(200),
-            TextInput::make('pemberi')->label('Pemberi')->maxLength(150),
-            Select::make('tingkat')->label('Tingkat')->options(TingkatKegiatan::class)->required(),
-            DatePicker::make('tanggal')->label('Tanggal'),
-            TextInput::make('nomor_sk')->label('Nomor SK')->maxLength(100),
-            TautanBerkasField::make('penghargaan', JenisTautan::Penghargaan, 'Tautan bukti')->columnSpanFull(),
-        ]);
+        /** @var Pegawai $pegawai */
+        $pegawai = $this->getOwnerRecord();
+
+        return $schema->components(PenghargaanForm::components($pegawai));
     }
 
     public function table(Table $table): Table

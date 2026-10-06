@@ -5,11 +5,15 @@ namespace App\Filament\Swalayan\Pages;
 use App\Enums\JenisTautan;
 use App\Filament\Forms\TautanBerkasField;
 use App\Filament\Support\AksiTampilSensitif;
+use App\Filament\Swalayan\Support\AksiUsulan;
 use App\Models\Pegawai;
+use App\Support\RegistriTargetUsulan;
 use BackedEnum;
+use Filament\Actions\ActionGroup;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -47,13 +51,25 @@ class ProfilSaya extends Page
             ->firstOrFail();
     }
 
+    /** @return array<int, mixed> */
+    protected function getHeaderActions(): array
+    {
+        return [
+            AksiUsulan::biodata(),
+            ActionGroup::make(array_map(
+                fn (string $tabel) => AksiUsulan::tambah($tabel),
+                array_values(array_filter(RegistriTargetUsulan::tabel(), fn (string $t) => isset(AksiUsulan::FORM[$t]) && $t !== 'pegawai')),
+            ))->label('Usulkan tambah data')->icon(Heroicon::OutlinedPlus)->button(),
+        ];
+    }
+
     public function content(Schema $schema): Schema
     {
         return $schema->record($this->getPegawai())->components([
             Tabs::make('Profil')->columnSpanFull()->persistTabInQueryString()->tabs([
                 $this->tabBiodata(),
                 $this->tabRiwayat('Jabatan Fungsional', [
-                    ['riwayatJabatanFungsional', 'Jabatan fungsional', [
+                    ['riwayatJabatanFungsional', 'Jabatan fungsional', 'riwayat_jabatan_fungsional', [
                         TextEntry::make('jabatanFungsional.nama')->label('Jabatan'),
                         TextEntry::make('tmt')->label('TMT')->date('d F Y'),
                         TextEntry::make('nomor_sk')->label('Nomor SK'),
@@ -61,13 +77,13 @@ class ProfilSaya extends Page
                     ]],
                 ]),
                 $this->tabRiwayat('Pangkat & KGB', [
-                    ['riwayatPangkat', 'Pangkat', [
+                    ['riwayatPangkat', 'Pangkat', 'riwayat_pangkat', [
                         TextEntry::make('golongan.label')->label('Golongan'),
                         TextEntry::make('tmt')->label('TMT')->date('d F Y'),
                         TextEntry::make('nomor_sk')->label('Nomor SK'),
                         TautanBerkasField::entri('sk', JenisTautan::Sk, 'Berkas SK'),
                     ]],
-                    ['riwayatKgb', 'Kenaikan gaji berkala', [
+                    ['riwayatKgb', 'Kenaikan gaji berkala', 'riwayat_kgb', [
                         TextEntry::make('tmt')->label('TMT')->date('d F Y'),
                         TextEntry::make('gaji_pokok')->label('Gaji pokok')->placeholder('-')
                             ->formatStateUsing(fn (?string $state): string => $state === null ? '-' : 'Rp '.number_format((float) $state, 2, ',', '.')),
@@ -75,14 +91,14 @@ class ProfilSaya extends Page
                     ]],
                 ]),
                 $this->tabRiwayat('Struktural', [
-                    ['riwayatJabatanStruktural', 'Jabatan struktural/tugas tambahan', [
+                    ['riwayatJabatanStruktural', 'Jabatan struktural/tugas tambahan', 'riwayat_jabatan_struktural', [
                         TextEntry::make('jenisJabatanStruktural.nama')->label('Jabatan'),
                         TextEntry::make('unitKerja.nama')->label('Unit kerja')->placeholder('-'),
                         TextEntry::make('periode')->label('Periode'),
                     ]],
                 ]),
                 $this->tabRiwayat('Pendidikan', [
-                    ['riwayatPendidikan', 'Pendidikan', [
+                    ['riwayatPendidikan', 'Pendidikan', 'riwayat_pendidikan', [
                         TextEntry::make('jenjangPendidikan.nama')->label('Jenjang'),
                         TextEntry::make('nama_pt')->label('Perguruan tinggi'),
                         TextEntry::make('tahun_lulus')->label('Lulus')->placeholder('-'),
@@ -90,7 +106,7 @@ class ProfilSaya extends Page
                     ]],
                 ]),
                 $this->tabRiwayat('Sertifikasi', [
-                    ['sertifikasi', 'Sertifikasi', [
+                    ['sertifikasi', 'Sertifikasi', 'sertifikasi', [
                         TextEntry::make('jenisSertifikasi.nama')->label('Jenis'),
                         TextEntry::make('nama')->label('Nama'),
                         TextEntry::make('tanggal_kedaluwarsa')->label('Kedaluwarsa')->date('d F Y')->placeholder('-'),
@@ -98,26 +114,26 @@ class ProfilSaya extends Page
                     ]],
                 ]),
                 $this->tabRiwayat('Pengembangan Diri', [
-                    ['penghargaan', 'Penghargaan', [
+                    ['penghargaan', 'Penghargaan', 'penghargaan', [
                         TextEntry::make('nama')->label('Nama'),
                         TextEntry::make('tingkat')->label('Tingkat')->badge(),
                         TextEntry::make('tanggal')->label('Tanggal')->date('d F Y')->placeholder('-'),
                     ]],
-                    ['pelatihan', 'Pelatihan', [
+                    ['pelatihan', 'Pelatihan', 'pelatihan', [
                         TextEntry::make('nama')->label('Nama'),
                         TextEntry::make('jenis')->label('Jenis')->badge(),
                         TextEntry::make('jumlah_jam')->label('Jam')->placeholder('-'),
                     ]],
                 ]),
                 $this->tabRiwayat('Keluarga', [
-                    ['keluarga', 'Keluarga', [
+                    ['keluarga', 'Keluarga', 'keluarga', [
                         TextEntry::make('hubungan')->label('Hubungan')->badge(),
                         TextEntry::make('nama')->label('Nama'),
                         TextEntry::make('nik_tersamar')->label('NIK')->fontFamily('mono'),
                     ]],
                 ]),
                 $this->tabRiwayat('Studi Lanjut', [
-                    ['studiLanjut', 'Studi lanjut', [
+                    ['studiLanjut', 'Studi lanjut', 'studi_lanjut', [
                         TextEntry::make('jenis')->label('Jenis')->badge(),
                         TextEntry::make('nama_pt')->label('Perguruan tinggi'),
                         TextEntry::make('status')->label('Status')->badge(),
@@ -151,13 +167,14 @@ class ProfilSaya extends Page
     }
 
     /**
-     * @param  list<array{0: string, 1: string, 2: list<Component>}>  $kelompok  [relasi, judul, entri]
+     * @param  list<array{0: string, 1: string, 2: string, 3: list<Component>}>  $kelompok  [relasi, judul, tabel usulan, entri]
      */
     private function tabRiwayat(string $judul, array $kelompok): Tab
     {
         $komponen = [];
 
-        foreach ($kelompok as [$relasi, $subjudul, $entri]) {
+        foreach ($kelompok as [$relasi, $subjudul, $tabel, $entri]) {
+            $entri[] = Actions::make([AksiUsulan::ubah($tabel), AksiUsulan::hapus($tabel)])->columnSpanFull();
             $komponen[] = RepeatableEntry::make($relasi)->label($subjudul)->schema($entri)->columns(['default' => 1, 'sm' => 2])->contained()
                 ->placeholder('Belum ada data')->columnSpanFull();
         }

@@ -5,18 +5,13 @@ namespace App\Filament\Admin\Resources\Pegawai\RelationManagers;
 use App\Actions\Riwayat\HapusRiwayatJabatanFungsional;
 use App\Actions\Riwayat\SimpanRiwayatJabatanFungsional;
 use App\Enums\JenisTautan;
-use App\Enums\Peran;
 use App\Filament\Forms\TautanBerkasField;
-use App\Models\JabatanFungsional;
+use App\Filament\Schemas\JabatanFungsionalForm;
 use App\Models\Pegawai;
 use App\Models\RiwayatJabatanFungsional;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -37,20 +32,7 @@ class JabatanFungsionalRelationManager extends RelationManager
         /** @var Pegawai $pegawai */
         $pegawai = $this->getOwnerRecord();
 
-        return $schema->components([
-            Select::make('jabatan_fungsional_id')->label('Jabatan')->required()->searchable()
-                ->options(fn (): array => JabatanFungsional::query()->aktif()
-                    ->where('kelompok', $pegawai->jenis_pegawai->value)->orderBy('urutan')->pluck('nama', 'id')->all()),
-            DatePicker::make('tmt')->label('TMT')->required(),
-            TextInput::make('nomor_sk')->label('Nomor SK')->required()->maxLength(100),
-            DatePicker::make('tanggal_sk')->label('Tanggal SK'),
-            TextInput::make('angka_kredit')->label('Angka kredit')->numeric()->minValue(0)
-                ->helperText('Isi bila tercantum di SK'),
-            Toggle::make('is_koreksi')->label('Koreksi data (boleh menurunkan jenjang)')
-                ->visible(fn (): bool => (bool) auth()->user()?->hasAnyRole([Peran::SuperAdmin->value, Peran::AdminKepegawaian->value])),
-            TextInput::make('keterangan')->label('Keterangan')->maxLength(255)->columnSpanFull(),
-            TautanBerkasField::make('sk', JenisTautan::Sk, 'Tautan berkas SK')->columnSpanFull(),
-        ]);
+        return $schema->components(JabatanFungsionalForm::components($pegawai));
     }
 
     public function table(Table $table): Table
