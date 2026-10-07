@@ -9,8 +9,8 @@
 |---|---|---|
 | Bahasa | **PHP 8.4** (minimal 8.3) | Laravel 13 mensyaratkan PHP ≥ 8.3 |
 | Framework | **Laravel 13.x** (rilis 17 Maret 2026) | Bug fix s.d. Q3 2027, security fix s.d. 17 Maret 2028. Constraint `^13.0` |
-| Basis data | **MySQL 8.4 LTS** | `utf8mb4` / `utf8mb4_0900_ai_ci`, engine InnoDB, zona waktu aplikasi `Asia/Jakarta` |
-| Cache, sesi, antrean, lock | **Redis 7.x** | Satu instance, DB index dipisah: 0=default, 1=cache, 2=queue (atur via `REDIS_*_DB`) |
+| Basis data | **MySQL 8.4 LTS** (native di host saat pengembangan, §2) | `utf8mb4` / `utf8mb4_0900_ai_ci`, engine InnoDB, zona waktu aplikasi `Asia/Jakarta` |
+| Cache, sesi, antrean, lock | **Redis 7.x** | Satu container bersama; setiap aplikasi memakai blok DB index & prefiks sendiri (default, cache, queue — §2.1) |
 | Monitor antrean | **Laravel Horizon** | Dashboard `/horizon`, hanya role `super-admin` |
 | Panel back-office | **Filament 5** (di atas Livewire 4) | CRUD, tabel, filter, impor/ekspor bawaan, notifikasi database, MFA |
 | Halaman publik / swalayan | Blade + **Livewire 4** + **Tailwind CSS 4** | Dibangun dengan Vite |
@@ -52,51 +52,277 @@ Aturan wajib:
 
 Layanan opsional (pakai bila memang dibutuhkan, bukan default): Meilisearch (pencarian), Gotenberg (PDF presisi), Laravel Reverb (notifikasi real-time). MinIO (penyimpanan objek) baru relevan bila kelak kebijakan §1a dicabut.
 
-## 2. Lingkungan pengembangan (Windows)
+## 2. Lingkungan pengembangan: Docker FKIP (tanpa Sail)
 
-Pilih salah satu, konsisten dalam satu tim:
+Keputusan 6 Oktober 2026: semua sistem berjalan di **Docker yang sudah ada di mesin pengembang** mengikuti pola repo `alias` (`~/code/<app>`, container `<app>-php` & `<app>-nginx`), **bukan** Laravel Sail dan bukan PHP di host. Perintah PHP/Composer/NPM selalu dijalankan **di dalam container** lewat alias shell per aplikasi.
 
-**A. Laravel Sail di WSL2 (disarankan, paling mirip server)**
+| Komponen | Letak | Catatan |
+|---|---|---|
+| MySQL 8.4 | **Native di host** (bukan container) | Dijangkau container lewat `host.docker.internal`; satu database + satu database uji + satu pengguna per aplikasi |
+| Redis 7 | **Satu container bersama** (sudah ada) | Setiap aplikasi memakai blok DB index & prefiks sendiri (§2.1) |
+| Mailpit | **Satu container bersama** (dibuat sekali, §2.2) | SMTP `mailpit:1025`, UI `http://localhost:8025` |
+| Jaringan | `fkip-net` (external) | Menghubungkan container aplikasi dengan Redis & Mailpit bersama |
+| PHP-FPM 8.4, Nginx, Horizon, scheduler | Per aplikasi, di `docker-compose.yml` repo | Templat §2.3 |
+| Gotenberg (Surat), Meilisearch (Regulasi) | Per aplikasi, internal (tanpa port host) | Ditambahkan pada langkah sistem terkait |
+
+### 2.1 Alokasi per aplikasi
+
+| Aplikasi | Folder | Container PHP | Alias shell | Port Nginx | Database MySQL | Redis DB (default / cache / queue) | Prefiks Redis |
+|---|---|---|---|---|---|---|---|
+| alias | `~/code/alias` | `alias-php` | `ap` | 8018 (sudah ada) | `alias`, `alias_testing` | 16 / 17 / 18 | `alias_` |
+| akreditasi | `~/code/akreditasi` | `akreditasi-php` | `akp` | 8011 | `akreditasi`, `akreditasi_testing` | 20 / 21 / 22 | `akreditasi_` |
+| aset | `~/code/aset` | `aset-php` | `asp` | 8012 | `aset`, `aset_testing` | 24 / 25 / 26 | `aset_` |
+| kerjasama | `~/code/kerjasama` | `kerjasama-php` | `ksp` | 8013 | `kerjasama`, `kerjasama_testing` | 28 / 29 / 30 | `kerjasama_` |
+| keuangan | `~/code/keuangan` | `keuangan-php` | `kup` | 8014 | `keuangan`, `keuangan_testing` | 32 / 33 / 34 | `keuangan_` |
+| lms | `~/code/lms` | `lms-php` | `lmp` | 8015 | `lms`, `lms_testing` | 36 / 37 / 38 (+ `kuis` 39) | `lms_` |
+| puspresma | `~/code/puspresma` | `puspresma-php` | `psp` | 8016 | `puspresma`, `puspresma_testing` | 40 / 41 / 42 | `puspresma_` |
+| regulasi | `~/code/regulasi` | `regulasi-php` | `rgp` | 8017 | `regulasi`, `regulasi_testing` | 44 / 45 / 46 | `regulasi_` |
+| sdm | `~/code/sdm` | `sdm-php` | `sdp` | 8019 | `sdm`, `sdm_testing` | 48 / 49 / 50 | `sdm_` |
+| surat | `~/code/surat` | `surat-php` | `srp` | 8020 | `surat`, `surat_testing` | 52 / 53 / 54 | `surat_` |
+
+- DB index 0–15 dibiarkan untuk aplikasi lama yang sudah memakai Redis bersama (fkipapp, plp, dll.). Karena `cache:clear` menjalankan `FLUSHDB`, **cache setiap aplikasi wajib di DB index sendiri** — jangan pernah berbagi DB cache antaraplikasi.
+- Port dan nama container boleh disesuaikan bila bentrok dengan layanan yang sudah ada; ubah tabel ini di semua folder.
+- Nama repositori di GitHub boleh berbeda (mis. `siman-fkip`, `persuratan-fkip`); folder kerja lokal tetap `~/code/<app>` agar hook dan alias seragam.
+
+Alias shell (tambahkan sekali ke `~/.bashrc`, dijalankan dari root repo masing-masing):
 ```bash
-# di dalam WSL2 Ubuntu, bukan di C:\
-composer create-project laravel/laravel <nama-app> "^13.0"
-cd <nama-app>
-php artisan sail:install --with=mysql,redis,mailpit   # tambah meilisearch/minio bila perlu
-./vendor/bin/sail up -d
+alias ap='docker compose exec alias-php'
+alias akp='docker compose exec akreditasi-php'
+alias asp='docker compose exec aset-php'
+alias ksp='docker compose exec kerjasama-php'
+alias kup='docker compose exec keuangan-php'
+alias lmp='docker compose exec lms-php'
+alias psp='docker compose exec puspresma-php'
+alias rgp='docker compose exec regulasi-php'
+alias sdp='docker compose exec sdm-php'
+alias srp='docker compose exec surat-php'
+```
+Contoh: `asp php artisan test`, `asp ./vendor/bin/pint`, `asp composer require …`, `asp npm run build`.
+
+### 2.2 Infrastruktur bersama (sekali per mesin)
+
+```bash
+# 1) Jaringan bersama, lalu sambungkan container Redis yang sudah ada dengan nama jaringan "redis"
+docker network create fkip-net
+docker network connect --alias redis fkip-net <nama-container-redis>
+
+# 2) Redis harus menyediakan ≥ 64 DB index dan sebaiknya persisten (antrean & jawaban kuis LMS).
+#    Jalankan ulang container Redis dengan perintah (atau ubah redis.conf/compose-nya):
+#    redis-server --databases 64 --appendonly yes
+
+# 3) Mailpit bersama
+docker run -d --name mailpit --restart unless-stopped --network fkip-net \
+  -p 127.0.0.1:8025:8025 axllent/mailpit
 ```
 
-**B. Laravel Herd for Windows + MySQL & Redis via Docker Desktop**
-```bash
-composer create-project laravel/laravel <nama-app> "^13.0"
-docker run -d --name mysql84 -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 mysql:8.4
-docker run -d --name redis7 -p 6379:6379 redis:7-alpine
+MySQL native (sekali per mesin, lalu sekali per aplikasi):
+```ini
+# my.cnf / mysqld.cnf — dengarkan juga di gateway Docker agar container dapat terhubung (MySQL ≥ 8.0.13)
+[mysqld]
+bind-address = 127.0.0.1,172.17.0.1
 ```
+```sql
+-- ganti <app> dan <rahasia>; '172.%' = subnet jaringan Docker di host Linux/WSL
+CREATE DATABASE `<app>` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE `<app>_testing` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER '<app>'@'172.%' IDENTIFIED BY '<rahasia>';
+GRANT ALL PRIVILEGES ON `<app>`.* TO '<app>'@'172.%';
+GRANT ALL PRIVILEGES ON `<app>\_testing%`.* TO '<app>'@'172.%';   -- termasuk DB uji paralel <app>_testing_test_N
+```
+Bila MySQL native berada di Windows sementara Docker berjalan di WSL2 (Docker Desktop), `host.docker.internal` menunjuk ke Windows: buat pengguna dengan host yang sesuai dan batasi lewat firewall **(cek di mesin Anda)**. Uji koneksi: `docker compose exec <app>-php php -r "new PDO('mysql:host=host.docker.internal;dbname=<app>', '<app>', '<rahasia>'); echo 'ok';"`.
+
+### 2.3 Templat berkas Docker per aplikasi
+
+`docker/php/Dockerfile`:
+```dockerfile
+FROM php:8.4-fpm
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo_mysql redis intl gd bcmath pcntl zip exif opcache
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+# Node 22 untuk Vite/Tailwind di dalam container
+COPY --from=node:22-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:22-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+ && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+# paket sistem tambahan per aplikasi (mis. Regulasi: poppler-utils) ditambahkan di sini
+ARG UID=1000
+ARG GID=1000
+RUN groupmod -o -g ${GID} www-data && usermod -o -u ${UID} www-data
+USER www-data
+WORKDIR /var/www/html
+```
+
+`docker-compose.yml` (ganti `<app>` dan `<port>` sesuai §2.1):
+```yaml
+name: <app>
+
+x-php: &php
+  build:
+    context: ./docker/php
+    args: { UID: "${UID:-1000}", GID: "${GID:-1000}" }
+  image: <app>-php:dev
+  volumes: [".:/var/www/html"]
+  extra_hosts: ["host.docker.internal:host-gateway"]
+  networks: [default, fkip-net]
+  restart: unless-stopped
+
+services:
+  <app>-php:
+    <<: *php
+  <app>-nginx:
+    image: nginx:1.27-alpine
+    ports: ["<port>:80"]
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [<app>-php]
+    networks: [default, fkip-net]   # agar dapat dijangkau gateway (§2.4)
+    restart: unless-stopped
+  <app>-scheduler:
+    <<: *php
+    command: php artisan schedule:work
+  # <app>-horizon ditambahkan pada langkah pemasangan Horizon:
+  # <app>-horizon:
+  #   <<: *php
+  #   command: php artisan horizon
+
+networks:
+  fkip-net:
+    external: true
+```
+
+`docker/nginx/default.conf`:
+```nginx
+server {
+    listen 80;
+    root /var/www/html/public;
+    index index.php index.html;   # index.html untuk public/panduan/
+    client_max_body_size 20m;   # hanya impor Excel/CSV (§1a)
+    location / { try_files $uri $uri/ /index.php?$query_string; }
+    location ~ \.php$ {
+        fastcgi_pass <app>-php:9000;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+    location ~ /\.(?!well-known) { deny all; }
+}
+```
+
+Membuat proyek Laravel baru tanpa PHP di host (folder repo sudah berisi `docs/`, `CLAUDE.md`, dsb.):
+```bash
+cd ~/code/<app>
+docker run --rm -u "$(id -u):$(id -g)" -v "$PWD":/app -w /app composer:2 \
+  create-project laravel/laravel _laravel "^13.0" --ignore-platform-reqs
+# lalu pindahkan isi _laravel/ ke root tanpa menimpa berkas milik kita (dikerjakan agen di F1.1)
+```
+
+Sehari-hari: `docker compose up -d --build` · `<alias> php artisan migrate` · `<alias> npm run dev` · setelah mengubah kode antrean: `docker compose restart <app>-horizon`.
+
+### 2.4 Subpath produksi `https://supportfkip.unsil.ac.id/<app>`
+
+Semua sistem dipasang di **satu domain** dengan awalan path per aplikasi (pola yang sudah dipakai landing page `supportfkip.unsil.ac.id`: `dbsmatematika/`, `plp/`, dst.). Reverse proxy di depan memotong awalan lalu meneruskan ke Nginx aplikasi; aplikasi membangkitkan semua URL **dengan** awalan.
+
+| Hal | Ketentuan |
+|---|---|
+| URL | `APP_URL=https://supportfkip.unsil.ac.id/<app>` dan `ASSET_URL` = nilai yang sama. Lokal lewat gateway: `http://localhost:8080/<app>` |
+| Root URL | `AppServiceProvider::boot()`: bila path `APP_URL` tidak kosong → `URL::forceRootUrl(config('app.url'))`; bila skema https → `URL::forceScheme('https')` |
+| Proxy tepercaya | `bootstrap/app.php` → `trustProxies(at: env('TRUSTED_PROXIES'), headers: X-Forwarded-For/Host/Port/Proto/Prefix)`; produksi isi IP reverse proxy, lokal `*` |
+| Cookie | Satu domain dipakai bersama ⇒ wajib `SESSION_PATH=/<app>` dan `SESSION_COOKIE=<app>_session` (cookie `XSRF-TOKEN` & remember ikut path sesi), `SESSION_SECURE_COOKIE=true` di produksi |
+| Aset Vite | `npm run build` dijalankan dengan `ASSET_URL` terisi agar `laravel-vite-plugin` menulis base `/<app>/build/` (termasuk `url()` di CSS) |
+| Livewire 4, Filament 5, Horizon | URL update & skrip Livewire, aset Filament, path panel (`/<app>/admin`), dan Horizon (`/<app>/horizon`) mengikuti root URL; periksa via Laravel Boost, sesuaikan `Livewire::setUpdateRoute()`/`setScriptRoute()` bila perlu |
+| Kode | **Dilarang** URL absolut berawalan `/` di Blade/JS (`href="/…"`, `src="/…"`, `action="/…"`, `fetch('/…')`); selalu `route()`, `url()`, `asset()` atau path relatif. Diuji `tests/Arch/SubpathTest.php` |
+| QR & tautan tercetak | QR (aset, verifikasi surat/keuangan/puspresma) memuat awalan `/<app>` — **tetapkan awalan final sebelum mencetak label/naskah**, jangan diubah setelah produksi |
+| Uji | `tests/Feature/SubpathTest.php`: dengan `app.url` berawalan, `route()`/`asset()`/redirect login berawalan `/<app>` dan cookie sesi ber-path `/<app>` |
+
+Blok reverse proxy produksi (per aplikasi, di server depan):
+```nginx
+location = /<app> { return 301 /<app>/; }
+location /<app>/ {
+    proxy_pass http://127.0.0.1:<port>/;          # garis miring akhir = awalan dipotong
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Prefix /<app>;
+    client_max_body_size 20m;
+}
+```
+
+**Gateway lokal** (meniru produksi; sekali per mesin): satu container Nginx `gateway` di jaringan `fkip-net`, port 8080, yang menyajikan landing page `supportfkip/index.html` di `/` dan meneruskan `/<app>/` ke `<app>-nginx`:
+```nginx
+# ~/code/gateway/default.conf — tambah satu blok location per aplikasi
+server {
+    listen 80;
+    resolver 127.0.0.11 valid=10s;                 # DNS Docker; aplikasi yang belum jalan tidak membuat gateway gagal
+    location = / { root /usr/share/nginx/html; try_files /index.html =404; }
+    location = /aset { return 301 /aset/; }
+    location /aset/ {
+        set $up aset-nginx;
+        rewrite ^/aset/(.*)$ /$1 break;
+        proxy_pass http://$up;
+        proxy_set_header Host $host:8080;
+        proxy_set_header X-Forwarded-Proto http;
+        proxy_set_header X-Forwarded-Prefix /aset;
+    }
+}
+```
+```bash
+docker run -d --name gateway --restart unless-stopped --network fkip-net -p 8080:80   -v ~/code/gateway/default.conf:/etc/nginx/conf.d/default.conf:ro   -v ~/code/landing:/usr/share/nginx/html:ro nginx:1.27-alpine      # ~/code/landing = salinan index.html supportfkip
+```
+Sejak langkah "Siap subpath" di fase F1, akses lokal sehari-hari melalui `http://localhost:8080/<app>/`; port langsung (`<port>`) tetap untuk pemeriksaan kesehatan.
+
+**Catatan Alias:** di bawah subpath, tautan pendek menjadi `https://supportfkip.unsil.ac.id/alias/<kode>`. Bila kelak tersedia domain pendek khusus, cukup ubah `APP_URL`/`SHORT_URL` tanpa mengubah kode.
+
+### 2.5 Panduan pengguna per peran (HTML + tangkapan layar)
+
+Setelah semua fitur selesai (langkah terakhir sebelum rilis `v1.0.0`), setiap aplikasi membuat panduan per peran:
+
+- Lokasi: `public/panduan/index.html` (daftar peran) dan `public/panduan/<peran>.html`, gambar di `public/panduan/img/<peran>/NN-<langkah>.png`. Tersaji di `https://supportfkip.unsil.ac.id/<app>/panduan/` dan **ditautkan dari landing page aplikasi**; kartu aplikasi di landing page `supportfkip` (root `index.html`) juga diberi tautan "Panduan".
+- Format: **HTML statis saja** (bukan PDF/Markdown), CSS di dalam berkas, tanpa CDN, tautan & gambar **relatif** (aman untuk subpath), bahasa Indonesia, isi: tujuan peran, cara masuk, langkah bernomor + tangkapan layar + keterangan, tanya-jawab, kontak admin.
+- Tangkapan layar dibuat otomatis dengan **Playwright** (service `<app>-panduan`, profile `panduan`, image `mcr.microsoft.com/playwright`) melalui gateway (`http://gateway/<app>`), memakai `PanduanSeeder` (akun demo per peran + **data rekaan**, hanya `APP_ENV=local`). Dilarang memakai data pribadi asli.
+- Gambar panduan adalah aset statis buatan tim (bukan unggahan pengguna, §1a); kompres PNG, lebar maks 1366 px, total `public/panduan` ≤ 15 MB.
+- Diuji `tests/Feature/PanduanTest.php` (setiap peran punya halaman, setiap gambar ada, tidak ada path absolut). Perbarui panduan setiap kali alur atau tampilan berubah signifikan.
 
 ## 3. Konfigurasi dasar `.env`
 
 ```dotenv
 APP_NAME="<Nama Sistem> FKIP Unsil"
+APP_URL=http://localhost:8080/<app>   # produksi: https://supportfkip.unsil.ac.id/<app> (§2.4)
 APP_LOCALE=id
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=id_ID
 APP_TIMEZONE=Asia/Jakarta          # set juga di config/app.php
 
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1                  # 'mysql' bila memakai Sail
+DB_HOST=host.docker.internal       # MySQL native di host
 DB_PORT=3306
-DB_DATABASE=<nama_db>
-DB_USERNAME=<user>
+DB_DATABASE=<app>
+DB_USERNAME=<app>
 DB_PASSWORD=<rahasia>
 
 CACHE_STORE=redis
 SESSION_DRIVER=redis
 QUEUE_CONNECTION=redis
 REDIS_CLIENT=phpredis
-REDIS_HOST=127.0.0.1               # 'redis' bila memakai Sail
+REDIS_HOST=redis                   # container Redis bersama di jaringan fkip-net
+REDIS_PREFIX=<app>_
+REDIS_DB=<blok>                    # §2.1
+REDIS_CACHE_DB=<blok+1>
+REDIS_QUEUE_DB=<blok+2>
+CACHE_PREFIX=<app>_cache_
+HORIZON_PREFIX=<app>_horizon:
+
+ASSET_URL=${APP_URL}               # §2.4 subpath
+SESSION_PATH=/<app>
+SESSION_COOKIE=<app>_session
+TRUSTED_PROXIES=*                  # produksi: IP reverse proxy
 
 FILESYSTEM_DISK=local
 MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
 ```
+
+Uji (`phpunit.xml` / `.env.testing`): `DB_HOST=host.docker.internal`, `DB_DATABASE=<app>_testing`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=array` — uji tidak menyentuh Redis bersama.
 
 ## 4. Konvensi kode
 

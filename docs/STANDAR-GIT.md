@@ -5,6 +5,7 @@
 ## 1. Prinsip
 
 1. **Satu langkah vibecoding = satu commit yang lolos uji.** Jangan menumpuk beberapa langkah dalam satu commit, dan jangan meng-commit kode yang gagal `pint`/`pest`.
+   **Commit hanya bila test lulus**: blok Commit ditulis sebagai satu rantai `&&` (`<x> ./vendor/bin/pint && <x> php artisan test && git add -A && git commit …`), sehingga `git commit` tidak pernah berjalan bila test gagal; hook `pre-commit` (§6) menjalankan test lagi sebagai pengaman kedua. Jangan memakai `--no-verify`.
 2. **Satu fase = satu branch fitur → Pull Request → squash/merge ke `main` → tag versi.**
 3. `main` selalu bisa di-deploy. Tidak ada commit langsung ke `main` setelah fondasi (Fase 0–1) selesai.
 4. Agen AI **boleh** menulis kode, tetapi **manusia** yang meninjau `git diff` dan menjalankan commit.
@@ -66,10 +67,10 @@ git switch -c feat/f3-master-data
 
 # 1) tempel prompt langkah ke agen AI, tinjau hasilnya
 
-# 2) gerbang kualitas (wajib lolos)
-./vendor/bin/pint
-./vendor/bin/phpstan analyse --memory-limit=1G
-php artisan test            # atau ./vendor/bin/pest
+# 2) gerbang kualitas (wajib lolos) — di dalam container; <x> = alias shell aplikasi (STANDAR-TEKNIS §2.1)
+<x> ./vendor/bin/pint
+<x> ./vendor/bin/phpstan analyse --memory-limit=1G
+<x> php artisan test        # atau <x> ./vendor/bin/pest
 
 # 3) tinjau perubahan
 git status
@@ -98,13 +99,21 @@ if ! [[ "$first_line" =~ $pattern ]] && ! [[ "$first_line" =~ ^Merge ]]; then
 fi
 ```
 
-**`.githooks/pre-commit`** — memastikan format & uji cepat:
+**`.githooks/pre-commit`** — memastikan format & uji cepat. PHP berjalan di container (STANDAR-TEKNIS §2), jadi hook memanggil `docker compose exec`; nama service diturunkan dari nama folder repo (`~/code/<app>` → `<app>-php`):
 ```bash
 #!/usr/bin/env bash
 set -e
-./vendor/bin/pint --test
-php artisan test --parallel --stop-on-failure
+root="$(git rev-parse --show-toplevel)"
+svc="${APP_PHP_SERVICE:-$(basename "$root")-php}"
+cd "$root"
+if ! docker compose ps --status running --services | grep -qx "$svc"; then
+  echo "✖ Container $svc belum berjalan. Jalankan: docker compose up -d"
+  exit 1
+fi
+docker compose exec -T "$svc" ./vendor/bin/pint --test
+docker compose exec -T "$svc" php artisan test --parallel --stop-on-failure
 ```
+Git dijalankan di host (WSL); hanya pint & test yang masuk container.
 
 Aktifkan (sekali per klon):
 ```bash

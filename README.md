@@ -48,13 +48,14 @@ git config core.hooksPath .githooks   # aktifkan hook commit-msg dan pre-commit
 cp .env.example .env && php artisan key:generate
 ```
 
-Basis data memakai SQLite (tanpa MySQL); layanan Sail yang dipakai hanya Redis dan Mailpit.
+Semua perintah PHP/Composer/NPM dijalankan di container aplikasi (`sdp` = `docker compose exec sdm-php`); lihat
+`docs/STANDAR-TEKNIS.md` §2 untuk Docker FKIP, alokasi Redis (DB 48/49/50), dan sub-path `/sdm`.
 
 ## Menjalankan antrean
 
 ```bash
-./vendor/bin/sail artisan horizon        # worker antrean (default, impor, ekspor, notifikasi)
-./vendor/bin/sail artisan schedule:work  # penjadwal lokal
+docker compose restart sdm-horizon       # worker antrean (default, impor, ekspor, notifikasi) berjalan sebagai service
+docker compose logs -f sdm-scheduler     # penjadwal lokal berjalan sebagai service
 ```
 
 Dasbor Horizon: `/horizon` (lokal terbuka; dibatasi ke peran `super-admin` pada F2.4).
@@ -64,7 +65,7 @@ Dasbor Horizon: `/horizon` (lokal terbuka; dibatasi ke peran `super-admin` pada 
 Semua jadwal memakai zona waktu `Asia/Jakarta` dan `onOneServer()`. Jalankan lokal dengan:
 
 ```bash
-./vendor/bin/sail artisan schedule:work   # produksi: container scheduler menjalankan schedule:work
+sdp php artisan schedule:work   # produksi: container scheduler menjalankan schedule:work
 ```
 
 | Jadwal | Perintah | Fungsi |

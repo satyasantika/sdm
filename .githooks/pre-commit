@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+# PHP berjalan di container (STANDAR-TEKNIS §2); git berjalan di host.
+# Nama container diturunkan dari nama folder repo (~/code/<app> -> <app>-php); ganti lewat APP_PHP_SERVICE.
 set -e
-./vendor/bin/pint --test
-php artisan test --parallel --stop-on-failure
+root="$(git rev-parse --show-toplevel)"
+svc="${APP_PHP_SERVICE:-$(basename "$root")-php}"
+cd "$root"
+if ! docker ps --format '{{.Names}}' | grep -qx "$svc"; then
+  echo "✖ Container $svc belum berjalan. Jalankan: docker compose up -d"
+  exit 1
+fi
+docker exec -i -w /var/www/html "$svc" ./vendor/bin/pint --test
+docker exec -i -w /var/www/html "$svc" php artisan test --parallel --stop-on-failure

@@ -50,6 +50,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 
@@ -94,6 +95,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Carbon::setLocale('id');
         Date::use(CarbonImmutable::class);
+
+        $this->paksaUrlSubpath();
 
         Model::preventLazyLoading(! app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
@@ -163,5 +166,22 @@ class AppServiceProvider extends ServiceProvider
         RiwayatStatusPegawai::created(fn ($r) => $picu($prodiDari($r->pegawai_id)));
         JumlahMahasiswaProdi::saved(fn (JumlahMahasiswaProdi $j) => $picu($j->prodi_id));
         JumlahMahasiswaProdi::deleted(fn (JumlahMahasiswaProdi $j) => $picu($j->prodi_id));
+    }
+
+    /**
+     * Sub-path produksi (STANDAR-TEKNIS §2.4): bila path APP_URL tidak kosong, semua URL dibangkitkan
+     * dengan awalan itu, terlepas dari header proxy.
+     */
+    private function paksaUrlSubpath(): void
+    {
+        $url = (string) config('app.url');
+
+        if (parse_url($url, PHP_URL_PATH) !== null && trim((string) parse_url($url, PHP_URL_PATH), '/') !== '') {
+            URL::forceRootUrl($url);
+        }
+
+        if (str_starts_with($url, 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 }
