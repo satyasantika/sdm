@@ -22,12 +22,6 @@ Pegawai mengajukan perubahan datanya sendiri lewat swalayan untuk diverifikasi a
 
 | Berkas | Isi |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | Konteks untuk agen AI |
-| [`docs/01-PRD.md`](docs/01-PRD.md) | Kebutuhan produk, peran, aturan bisnis |
-| [`docs/02-ARSITEKTUR.md`](docs/02-ARSITEKTUR.md) | Stack, paket, Redis, panel, jadwal |
-| [`docs/03-SKEMA-DATABASE.md`](docs/03-SKEMA-DATABASE.md) | ERD dan definisi tabel |
-| [`docs/04-PROMPT-BERTAHAP.md`](docs/04-PROMPT-BERTAHAP.md) | Prompt bertahap fase F0–F10 |
-| [`docs/05-UJI-PENERIMAAN.md`](docs/05-UJI-PENERIMAAN.md) | Skenario UAT dan checklist rilis |
 | [`docs/STANDAR-TEKNIS.md`](docs/STANDAR-TEKNIS.md) | Standar teknis bersama |
 | [`docs/STANDAR-GIT.md`](docs/STANDAR-GIT.md) | Standar commit, branch, tag |
 | [`docs/PANDUAN-PENGGUNA.md`](docs/PANDUAN-PENGGUNA.md) | Panduan per peran dan FAQ |
