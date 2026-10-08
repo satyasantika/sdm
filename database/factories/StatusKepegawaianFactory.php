@@ -13,7 +13,7 @@ class StatusKepegawaianFactory extends Factory
     public function definition(): array
     {
         return [
-            'kode' => fake()->unique()->slug(2),
+            'kode' => fake()->unique()->bothify('status-????-####'),
             'nama' => fake()->words(2, true),
             'kelompok' => 'asn',
             'jenis_golongan' => 'pns',

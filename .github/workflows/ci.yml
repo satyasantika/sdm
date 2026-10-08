@@ -83,6 +83,9 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
           REDIS_HOST: 127.0.0.1
+          # Test mengasumsikan root domain; subpath /sdm dari .env.example hanya untuk produksi.
+          APP_URL: http://localhost
+          SESSION_PATH: /
 
       - name: Optimasi produksi (memastikan config/route cache tidak gagal)
         run: composer produksi
