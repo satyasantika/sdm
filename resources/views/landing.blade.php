@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
+    <meta name="color-scheme" content="light">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>SDM FKIP Unsil</title>
     <meta name="description" content="Sistem Informasi Sumber Daya Manusia Fakultas Keguruan dan Ilmu Pendidikan Universitas Siliwangi">
     <link rel="icon" href="{{ asset('favicon.ico') }}">
     <style>
-        :root{--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;--line:#e2e8f0;--aksen:#4f46e5;--aksen-bg:#eef2ff;--hero1:#312e81;--hero2:#4f46e5;--hero3:#0f766e}
-        @media (prefers-color-scheme:dark){:root{--bg:#0b1020;--fg:#e5e7eb;--muted:#94a3b8;--card:#131a2e;--line:#26304a;--aksen:#a5b4fc;--aksen-bg:#1e2547;--hero1:#1e1b4b;--hero2:#3730a3;--hero3:#115e59}}
+        :root{color-scheme:light;--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;--line:#e2e8f0;--aksen:#4f46e5;--aksen-bg:#eef2ff;--hero1:#312e81;--hero2:#4f46e5;--hero3:#0f766e}
         *{box-sizing:border-box}
         html{scroll-behavior:smooth}
         body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -24,7 +24,6 @@
         .bar nav a.tautan:hover{color:var(--aksen)}
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid transparent}
         .btn.utama{background:var(--aksen);color:#fff}
-        @media (prefers-color-scheme:dark){.btn.utama{color:#0b1020}}
         .btn.utama:hover{opacity:.92}
         .btn.garis{border-color:rgba(255,255,255,.45);color:#fff}
         .btn.garis:hover{background:rgba(255,255,255,.12)}
@@ -82,7 +81,6 @@
         .garis li::before{content:"";position:absolute;left:11px;top:22px;bottom:-2px;width:2px;background:var(--line)}
         .garis li:last-child::before{display:none}
         .garis li i{position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:50%;background:var(--aksen);color:#fff;display:grid;place-items:center;font-size:.72rem;font-style:normal;font-weight:800}
-        @media (prefers-color-scheme:dark){.garis li i{color:#0b1020}}
         .garis b{display:block}
         .garis span{color:var(--muted);font-size:.92rem}
         .status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px}

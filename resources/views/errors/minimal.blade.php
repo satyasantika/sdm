@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
+    <meta name="color-scheme" content="light">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>@yield('code') - @yield('title') · SDM FKIP Unsil</title>
     <style>
-        :root{--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;--line:#e2e8f0;--aksen:#4f46e5}
-        @media (prefers-color-scheme:dark){:root{--bg:#0b1020;--fg:#e5e7eb;--muted:#94a3b8;--card:#131a2e;--line:#26304a;--aksen:#a5b4fc}}
+        :root{color-scheme:light;--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;--line:#e2e8f0;--aksen:#4f46e5}
         *{box-sizing:border-box}
         body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
         .wadah{max-width:460px;width:100%;margin:0 auto;padding:40px 24px;text-align:center}
