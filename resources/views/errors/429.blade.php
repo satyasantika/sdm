@@ -3,3 +3,4 @@
 @section('title', 'Terlalu banyak permintaan')
 @section('code', '429')
 @section('message', 'Anda mengirim permintaan terlalu sering. Coba lagi beberapa saat.')
+@section('saran', 'Tunggu sekitar satu menit sebelum mencoba lagi.')
