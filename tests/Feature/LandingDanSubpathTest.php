@@ -1,6 +1,9 @@
 <?php
 
+use App\Actions\Laporan\HitungStatistikDasbor;
+use App\Models\Pegawai;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Support\Facades\Cache;
 
 afterEach(fn () => TrustProxies::flushState());
 
@@ -74,4 +77,14 @@ test('landing memuat bagian fitur, peran, dan privasi', function () {
 test('halaman login kedua panel memuat panel merek yang senada', function () {
     $this->get('/admin/login')->assertOk()->assertSee('sdm-samping', false)->assertSee('Panel Admin &amp; Pimpinan', false);
     $this->get('/saya/login')->assertOk()->assertSee('sdm-samping', false)->assertSee('Data Saya');
+});
+
+test('bagian gambaran SDM tersembunyi saat belum ada data dan tampil saat ada dosen aktif', function () {
+    Cache::forget(HitungStatistikDasbor::kunci(null));
+    $this->get('/')->assertOk()->assertDontSee('Gambaran SDM fakultas');
+
+    Pegawai::factory()->dosen()->create();
+    Cache::forget(HitungStatistikDasbor::kunci(null));
+
+    $this->get('/')->assertOk()->assertSee('Gambaran SDM fakultas')->assertSee('Jabatan fungsional')->assertDontSee('nik');
 });

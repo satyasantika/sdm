@@ -33,7 +33,9 @@ class SwalayanPanelProvider extends PanelProvider
                 'judul' => 'Data Saya',
                 'subjudul' => 'Lihat profil kepegawaian Anda dan ajukan perubahan data dengan mudah.',
                 'poin' => ['Profil dan riwayat karier Anda', 'Ajukan perubahan, pantau statusnya', 'Berkas cukup berupa tautan Drive'],
+                'aksen' => 'teal',
             ]))
+            ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn () => view('filament.auth.bantuan'))
             ->brandName('SDM FKIP — Data Saya')
             ->colors([
                 'primary' => Color::Teal,
