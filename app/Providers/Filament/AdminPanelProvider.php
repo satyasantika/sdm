@@ -37,7 +37,9 @@ class AdminPanelProvider extends PanelProvider
                 'judul' => 'Panel Admin & Pimpinan',
                 'subjudul' => 'Kelola data kepegawaian, verifikasi usulan, dan susun laporan fakultas.',
                 'poin' => ['Verifikasi usulan perubahan data', 'Impor BKD dan pengingat tenggat', 'Laporan DUK dan akreditasi'],
+                'aksen' => 'indigo',
             ]))
+            ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn () => view('filament.auth.bantuan'))
             ->brandName('SDM FKIP Unsil')
             ->profile()
             ->multiFactorAuthentication([AppAuthentication::make()->recoverable()])

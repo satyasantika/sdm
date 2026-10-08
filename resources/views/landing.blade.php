@@ -54,10 +54,6 @@
         .kartu h3{margin:12px 0 6px;font-size:1.05rem}
         .kartu p{margin:0;color:var(--muted);font-size:.93rem}
         .ikon{width:40px;height:40px;border-radius:11px;background:var(--aksen-bg);color:var(--aksen);display:grid;place-items:center;font-size:1.2rem}
-        .langkah{counter-reset:l;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-        .langkah .kartu{counter-increment:l;position:relative;padding-top:30px}
-        .langkah .kartu::before{content:counter(l);position:absolute;top:-16px;left:20px;width:34px;height:34px;border-radius:50%;background:var(--aksen);color:#fff;display:grid;place-items:center;font-weight:800}
-        @media (prefers-color-scheme:dark){.langkah .kartu::before{color:#0b1020}}
         .peran a.kartu{display:block;text-decoration:none;color:inherit}
         .peran a.kartu:hover{border-color:var(--aksen)}
         .peran a.kartu h3{color:var(--aksen);margin-top:0}
@@ -72,11 +68,44 @@
         .cta p{margin:0;color:rgba(255,255,255,.85)}
         footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.88rem}
         footer .wadah{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+        .bar-daftar{display:grid;gap:9px;margin:0;padding:0;list-style:none}
+        .bar-daftar li{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;font-size:.88rem}
+        .bar-daftar .nama{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .bar-daftar .jalur{height:10px;border-radius:999px;background:var(--aksen-bg);overflow:hidden}
+        .bar-daftar .isi{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--hero2),var(--hero3))}
+        .bar-daftar b{font-variant-numeric:tabular-nums}
+        .panel-data{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+        .panel-data .kartu h3{margin:0 0 14px;font-size:1rem}
+        .garis{position:relative;display:grid;gap:0;margin:0;padding:0;list-style:none}
+        .garis li{position:relative;padding:0 0 22px 34px}
+        .garis li::before{content:"";position:absolute;left:11px;top:22px;bottom:-2px;width:2px;background:var(--line)}
+        .garis li:last-child::before{display:none}
+        .garis li i{position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:50%;background:var(--aksen);color:#fff;display:grid;place-items:center;font-size:.72rem;font-style:normal;font-weight:800}
+        @media (prefers-color-scheme:dark){.garis li i{color:#0b1020}}
+        .garis b{display:block}
+        .garis span{color:var(--muted);font-size:.92rem}
+        .status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px}
+        .status span{padding:5px 12px;border-radius:999px;font-size:.82rem;font-weight:600;border:1px solid var(--line);background:var(--card)}
+        .status .ok{color:#047857;border-color:#a7f3d0;background:#ecfdf5}
+        .status .ret{color:#b45309;border-color:#fde68a;background:#fffbeb}
+        .status .tol{color:#b91c1c;border-color:#fecaca;background:#fef2f2}
+        .status em{color:var(--muted);font-style:normal}
+        .modul{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+        .modul div{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:14px 16px}
+        .modul b{display:block;font-size:.95rem}
+        .modul span{color:var(--muted);font-size:.85rem}
+        details.tanya{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:0 0 10px}
+        details.tanya summary{cursor:pointer;font-weight:600}
+        details.tanya p{margin:10px 0 0;color:var(--muted);font-size:.94rem}
+        .api{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:18px 20px;font:.85rem/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto}
+        .api .k{color:#94a3b8}.api .h{color:#5eead4}
         @media (max-width:860px){
             .hero .wadah,.dua{grid-template-columns:1fr}
             .hero h1{font-size:2.1rem}
             .bar nav a.tautan{display:none}
             .cta{padding:30px 24px}
+            .aksi .btn{width:100%}
         }
     </style>
 </head>
@@ -86,6 +115,7 @@
         <a class="logo" href="{{ url('/') }}"><span class="mono">SDM</span><span>SDM FKIP Unsil<small>Universitas Siliwangi</small></span></a>
         <nav>
             <a class="tautan" href="#fitur">Fitur</a>
+            @if (($statistik['jumlah_dosen'] ?? 0) > 0)<a class="tautan" href="#gambaran">Gambaran</a>@endif
             <a class="tautan" href="#peran">Peran</a>
             <a class="tautan" href="#privasi">Privasi</a>
             <a class="tautan" href="{{ url('panduan/index.html') }}">Panduan</a>
@@ -106,7 +136,7 @@
                 <a class="btn garis" href="{{ url('admin') }}">Masuk Admin &amp; Pimpinan</a>
             </div>
         </div>
-        @if ($statistik ?? null)
+        @if (($statistik['jumlah_dosen'] ?? 0) + ($statistik['jumlah_tendik'] ?? 0) > 0)
             <div class="stat">
                 <div class="kotak"><div class="angka">{{ number_format($statistik['jumlah_dosen']) }}</div><div class="ket">Dosen aktif</div></div>
                 <div class="kotak"><div class="angka">{{ number_format($statistik['jumlah_tendik']) }}</div><div class="ket">Tenaga kependidikan</div></div>
@@ -136,7 +166,42 @@
     </div>
 </section>
 
-<section class="pita" id="swalayan">
+
+@php
+    $maks = fn (array $d): int => max(1, ...array_values($d ?: [1]));
+    $urut = fn (array $d, int $n = 8): array => array_slice($d, 0, $n, true);
+    $jabatan = $statistik['dosen_per_jabatan'] ?? [];
+    $pendidikan = $statistik['dosen_per_pendidikan'] ?? [];
+    $prodi = $statistik['dosen_per_prodi'] ?? [];
+    arsort($prodi);
+@endphp
+@if (($statistik['jumlah_dosen'] ?? 0) > 0)
+<section class="pita" id="gambaran">
+    <div class="wadah">
+        <div class="kepala">
+            <span class="atas">Gambaran SDM fakultas</span>
+            <h2>Komposisi dosen secara agregat</h2>
+            <p>Dihitung langsung dari data induk dan diperbarui otomatis. Hanya angka ringkasan, tanpa data pribadi.</p>
+        </div>
+        <div class="panel-data">
+            @foreach ([['Jabatan fungsional', $jabatan], ['Pendidikan tertinggi', $pendidikan], ['Dosen per program studi', $prodi]] as [$judul, $set])
+                @if (count($set))
+                    <div class="kartu">
+                        <h3>{{ $judul }}</h3>
+                        <ul class="bar-daftar">
+                            @foreach ($urut($set) as $nama => $jumlah)
+                                <li><span class="nama" title="{{ $nama }}">{{ $nama }}</span><span class="jalur"><span class="isi" style="width:{{ round($jumlah / $maks($set) * 100) }}%"></span></span><b>{{ number_format($jumlah) }}</b></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<section id="swalayan">
     <div class="wadah dua">
         <div>
             <div class="kepala" style="margin:0">
@@ -154,20 +219,6 @@
     </div>
 </section>
 
-<section>
-    <div class="wadah">
-        <div class="kepala">
-            <span class="atas">Alur kerja</span>
-            <h2>Tiga langkah, tanpa kertas</h2>
-        </div>
-        <div class="langkah">
-            <div class="kartu"><h3>Pegawai mengajukan</h3><p>Isi perubahan data dan tempel tautan berkas pendukung dari Drive.</p></div>
-            <div class="kartu"><h3>Admin memverifikasi</h3><p>Admin kepegawaian atau admin prodi memeriksa, lalu menyetujui atau mengembalikan dengan catatan.</p></div>
-            <div class="kartu"><h3>Data terbarui</h3><p>Perubahan diterapkan, riwayat tercatat, dan pengingat dihitung ulang otomatis.</p></div>
-        </div>
-    </div>
-</section>
-
 <section class="pita peran" id="peran">
     <div class="wadah">
         <div class="kepala">
@@ -175,7 +226,7 @@
             <h2>Setiap pengguna melihat yang relevan</h2>
             <p>Akses dibatasi sesuai peran. Klik untuk membaca panduannya.</p>
         </div>
-        <div class="grid">
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
             <a class="kartu" href="{{ url('panduan/dosen-tendik.html') }}"><h3>Dosen &amp; Tendik</h3><p>Lihat profil, ajukan perubahan, dan pantau usulan.</p></a>
             <a class="kartu" href="{{ url('panduan/admin-prodi.html') }}"><h3>Admin Prodi</h3><p>Mengelola dan memverifikasi data pegawai program studinya.</p></a>
             <a class="kartu" href="{{ url('panduan/admin-kepegawaian.html') }}"><h3>Admin Kepegawaian</h3><p>Pengelolaan data fakultas, verifikasi, impor BKD, dan laporan.</p></a>
@@ -184,7 +235,88 @@
     </div>
 </section>
 
-<section id="privasi">
+
+<section id="siklus">
+    <div class="wadah dua">
+        <div>
+            <div class="kepala" style="margin:0">
+                <span class="atas">Pengingat otomatis</span>
+                <h2>Tidak ada tenggat karier yang terlewat</h2>
+                <p>Sistem menghitung sendiri jadwal penting tiap pegawai dari riwayat dan aturan yang berlaku, lalu mengirim pengingat bertahap.</p>
+            </div>
+            <div class="status">
+                <span>90 hari</span><em>→</em><span>30 hari</span><em>→</em><span>7 hari sebelum tenggat</span>
+            </div>
+        </div>
+        <ol class="garis">
+            <li><i>1</i><b>Kenaikan pangkat &amp; KGB</b><span>Interval dihitung dari TMT terakhir sesuai jenis status kepegawaian.</span></li>
+            <li><i>2</i><b>Kenaikan jabatan fungsional</b><span>Syarat jenjang dan angka kredit mengikuti ketentuan yang tersimpan di sistem.</span></li>
+            <li><i>3</i><b>Masa berlaku dokumen &amp; sertifikat</b><span>Dokumen yang lewat tanggal otomatis ditandai kedaluwarsa.</span></li>
+            <li><i>4</i><b>Batas usia pensiun</b><span>Proyeksi pensiun per tahun membantu perencanaan kebutuhan dosen.</span></li>
+        </ol>
+    </div>
+</section>
+
+<section class="pita" id="modul">
+    <div class="wadah">
+        <div class="kepala">
+            <span class="atas">Cakupan data</span>
+            <h2>Satu profil, seluruh rekam jejak</h2>
+        </div>
+        <div class="modul">
+            <div><b>Identitas &amp; status</b><span>NIP, NIDN, NUPTK, ASN/Non-ASN, homebase</span></div>
+            <div><b>Jabatan fungsional</b><span>Riwayat, TMT, dan status terkini</span></div>
+            <div><b>Pangkat &amp; KGB</b><span>Golongan, masa kerja, kenaikan berkala</span></div>
+            <div><b>Jabatan struktural</b><span>Penugasan dan masa jabatan</span></div>
+            <div><b>Pendidikan</b><span>Jenjang, institusi, dan studi lanjut</span></div>
+            <div><b>Sertifikasi</b><span>Serdos dan sertifikat lain beserta masa berlaku</span></div>
+            <div><b>Pelatihan &amp; penghargaan</b><span>Rekam kegiatan pengembangan diri</span></div>
+            <div><b>Keluarga</b><span>Data tanggungan, terlindungi dan terenkripsi</span></div>
+            <div><b>Dokumen</b><span>Tautan berkas dengan masa berlaku</span></div>
+            <div><b>Rekap BKD</b><span>Impor Excel SISTER per semester</span></div>
+        </div>
+    </div>
+</section>
+
+<section id="verifikasi">
+    <div class="wadah">
+        <div class="kepala">
+            <span class="atas">Kendali mutu data</span>
+            <h2>Setiap perubahan lewat verifikasi</h2>
+            <p>Dosen dan tendik tidak menulis langsung ke data induk. Perubahan diajukan sebagai usulan, diperiksa admin, lalu diterapkan dengan jejak audit.</p>
+            <div class="status">
+                <span>Diajukan</span><em>→</em><span class="ok">Disetujui &amp; diterapkan</span><span class="ret">Dikembalikan dengan catatan</span><span class="tol">Ditolak dengan alasan</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pita" id="integrasi">
+    <div class="wadah dua">
+        <div class="kepala" style="margin:0">
+            <span class="atas">Untuk sistem FKIP lain</span>
+            <h2>Data rujukan yang bisa dipakai bersama</h2>
+            <p>API read-only bertoken menyediakan data pegawai non-sensitif bagi sistem fakultas lain, sehingga tidak perlu menyalin data secara manual.</p>
+        </div>
+        <div class="api"><span class="k">GET</span> /api/v1/pegawai<br><span class="k">Authorization:</span> <span class="h">Bearer &lt;token&gt;</span><br><span class="k">ability:</span> sdm:read · 60 permintaan/menit<br><span class="k">isi:</span> hanya field non-sensitif</div>
+    </div>
+</section>
+
+<section id="tanya">
+    <div class="wadah" style="max-width:820px">
+        <div class="kepala">
+            <span class="atas">Pertanyaan umum</span>
+            <h2>Yang sering ditanyakan</h2>
+        </div>
+        <details class="tanya"><summary>Siapa yang bisa mengakses sistem ini?</summary><p>Dosen dan tenaga kependidikan FKIP, admin kepegawaian, admin program studi, dan pimpinan. Setiap peran hanya melihat data sesuai kewenangannya; admin prodi dibatasi pada prodinya.</p></details>
+        <details class="tanya"><summary>Apakah saya perlu mengunggah berkas?</summary><p>Tidak. Berkas disimpan di Google Drive Anda sendiri, dan sistem hanya menyimpan tautannya. Berkas sensitif wajib dibagikan secara terbatas.</p></details>
+        <details class="tanya"><summary>Bagaimana jika data saya keliru?</summary><p>Masuk ke "Data Saya", ajukan perubahan beserta tautan bukti. Admin akan memeriksa dan menyetujui atau mengembalikannya dengan catatan.</p></details>
+        <details class="tanya"><summary>Siapa yang dapat melihat NIK, NPWP, dan rekening?</summary><p>Hanya pemilik data dan peran yang diberi izin khusus. Datanya tersimpan terenkripsi, tampil bertopeng, dan setiap akses penuh dicatat.</p></details>
+        <details class="tanya"><summary>Ke mana saya meminta bantuan?</summary><p>Mulai dari <a href="{{ url('panduan/index.html') }}">Panduan Pengguna</a> per peran, lalu hubungi admin kepegawaian fakultas bila masih ada kendala.</p></details>
+    </div>
+</section>
+
+<section class="pita" id="privasi">
     <div class="wadah dua">
         <div class="kepala" style="margin:0">
             <span class="atas">Privasi &amp; keamanan</span>
