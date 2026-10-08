@@ -27,6 +27,7 @@ class SwalayanPanelProvider extends PanelProvider
             ->id('swalayan')
             ->path('saya')
             ->login()
+            ->darkMode(false)
             ->passwordReset()
             ->profile()
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.samping', [
