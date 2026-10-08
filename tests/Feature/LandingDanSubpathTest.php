@@ -66,3 +66,12 @@ test('panduan tidak memuat data sensitif atau kata sandi demo', function () {
         expect(file_get_contents($berkas))->not->toContain('Demo-Sandi')->not->toContain('JBSWY3DPEHPK3PXP');
     }
 });
+
+test('landing memuat bagian fitur, peran, dan privasi', function () {
+    $this->get('/')->assertOk()->assertSee('Fitur')->assertSee('Pengingat tenggat')->assertSee('Privasi &amp; keamanan', false)->assertSee('panduan/dosen-tendik.html', false);
+});
+
+test('halaman login kedua panel memuat panel merek yang senada', function () {
+    $this->get('/admin/login')->assertOk()->assertSee('sdm-samping', false)->assertSee('Panel Admin &amp; Pimpinan', false);
+    $this->get('/saya/login')->assertOk()->assertSee('sdm-samping', false)->assertSee('Data Saya');
+});

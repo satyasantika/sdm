@@ -11,6 +11,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -28,6 +29,11 @@ class SwalayanPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->profile()
+            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.samping', [
+                'judul' => 'Data Saya',
+                'subjudul' => 'Lihat profil kepegawaian Anda dan ajukan perubahan data dengan mudah.',
+                'poin' => ['Profil dan riwayat karier Anda', 'Ajukan perubahan, pantau statusnya', 'Berkas cukup berupa tautan Drive'],
+            ]))
             ->brandName('SDM FKIP — Data Saya')
             ->colors([
                 'primary' => Color::Teal,

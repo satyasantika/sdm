@@ -33,6 +33,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->passwordReset()
+            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.samping', [
+                'judul' => 'Panel Admin & Pimpinan',
+                'subjudul' => 'Kelola data kepegawaian, verifikasi usulan, dan susun laporan fakultas.',
+                'poin' => ['Verifikasi usulan perubahan data', 'Impor BKD dan pengingat tenggat', 'Laporan DUK dan akreditasi'],
+            ]))
             ->brandName('SDM FKIP Unsil')
             ->profile()
             ->multiFactorAuthentication([AppAuthentication::make()->recoverable()])
