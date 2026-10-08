@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Laporan\HitungStatistikDasbor;
 use App\Http\Controllers\BukaTautanController;
 use App\Http\Controllers\UnduhKeluaranController;
 use Illuminate\Support\Facades\Route;
@@ -8,7 +9,9 @@ Route::get('/', function () {
     $user = auth()->user();
 
     if ($user === null) {
-        return view('landing');
+        $statistik = rescue(fn (): array => app(HitungStatistikDasbor::class)->handle(), null, report: false);
+
+        return view('landing', ['statistik' => $statistik]);
     }
 
     return redirect()->to($user->can('swalayan.akses') && $user->pegawai()->exists() ? '/saya' : '/admin');

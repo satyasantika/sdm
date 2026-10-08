@@ -26,6 +26,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use STS\FilamentImpersonate\Actions\Impersonate;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -98,6 +99,10 @@ class UserResource extends Resource
 
                         activity()->performedOn($record)->causedBy(auth()->user())->event('reset-mfa')->log('MFA direset');
                     }),
+                Impersonate::make()
+                    ->redirectTo(fn (User $record): string => $record->urlPanelUtama())
+                    ->icon(Heroicon::OutlinedEye)
+                    ->color('gray'),
                 DeleteAction::make()->hidden(fn (User $record): bool => $record->is(auth()->user())),
             ]);
     }

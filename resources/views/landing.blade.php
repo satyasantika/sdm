@@ -11,8 +11,14 @@
         *{box-sizing:border-box}
         body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
         .wadah{max-width:880px;margin:0 auto;padding:48px 16px}
+        .merek{display:flex;align-items:center;gap:8px;color:var(--aksen);font-weight:700;font-size:.9rem;letter-spacing:.02em;text-transform:uppercase;margin:0 0 16px}
+        .merek span.titik{width:7px;height:7px;border-radius:50%;background:var(--aksen);display:inline-block}
         h1{font-size:2rem;line-height:1.25;margin:0 0 .3em}
         p.lead{color:var(--muted);font-size:1.08rem;margin:0 0 28px}
+        .statistik{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:0 0 32px}
+        .statistik .kotak{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+        .statistik .angka{font-size:1.5rem;font-weight:700;color:var(--aksen)}
+        .statistik .label{color:var(--muted);font-size:.83rem;margin-top:2px}
         .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
         a.kartu{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;color:inherit}
         a.kartu:hover{border-color:var(--aksen)}
@@ -23,8 +29,17 @@
 </head>
 <body>
 <div class="wadah">
+    <p class="merek"><span class="titik"></span> FKIP Universitas Siliwangi</p>
     <h1>Sistem Informasi SDM FKIP Unsil</h1>
     <p class="lead">Data kepegawaian dosen dan tenaga kependidikan Fakultas Keguruan dan Ilmu Pendidikan Universitas Siliwangi.</p>
+    @if ($statistik ?? null)
+        <div class="statistik">
+            <div class="kotak"><div class="angka">{{ number_format($statistik['jumlah_dosen']) }}</div><div class="label">Dosen aktif</div></div>
+            <div class="kotak"><div class="angka">{{ number_format($statistik['jumlah_tendik']) }}</div><div class="label">Tenaga kependidikan</div></div>
+            <div class="kotak"><div class="angka">{{ $statistik['persen_s3'] }}%</div><div class="label">Dosen S3</div></div>
+            <div class="kotak"><div class="angka">{{ $statistik['persen_serdos'] }}%</div><div class="label">Dosen bersertifikasi</div></div>
+        </div>
+    @endif
     <div class="grid">
         <a class="kartu" href="{{ url('saya') }}"><h2>Masuk Dosen &amp; Tendik</h2><p>Lihat profil Anda dan ajukan perubahan data.</p></a>
         <a class="kartu" href="{{ url('admin') }}"><h2>Masuk Admin &amp; Pimpinan</h2><p>Pengelolaan data, verifikasi, dan laporan.</p></a>

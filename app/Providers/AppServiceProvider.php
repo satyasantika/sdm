@@ -33,6 +33,7 @@ use App\Models\Sertifikasi;
 use App\Models\StatusKepegawaian;
 use App\Models\StudiLanjut;
 use App\Models\TokenAkses;
+use App\Models\User;
 use App\Models\UsulanPerubahan;
 use App\Observers\KonfigurasiObserver;
 use App\Observers\MasterCacheObserver;
@@ -48,11 +49,14 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
+use STS\FilamentImpersonate\Events\EnterImpersonation;
+use STS\FilamentImpersonate\Events\LeaveImpersonation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -148,6 +152,42 @@ class AppServiceProvider extends ServiceProvider
         Sanctum::usePersonalAccessTokenModel(TokenAkses::class);
 
         DB::prohibitDestructiveCommands(app()->isProduction());
+
+        $this->catatImpersonasi();
+    }
+
+    /** Audit siapa menyamar sebagai siapa, kapan masuk dan keluar (K-15). */
+    private function catatImpersonasi(): void
+    {
+        Event::listen(EnterImpersonation::class, function (EnterImpersonation $event): void {
+            /** @var User $impersonator */
+            $impersonator = $event->impersonator;
+            /** @var User $impersonated */
+            $impersonated = $event->impersonated;
+
+            activity()
+                ->performedOn($impersonated)
+                ->causedBy($impersonator)
+                ->event('impersonate-masuk')
+                ->log('Menyamar sebagai '.$impersonated->name);
+        });
+
+        Event::listen(LeaveImpersonation::class, function (LeaveImpersonation $event): void {
+            if ($event->impersonated === null) {
+                return;
+            }
+
+            /** @var User $impersonator */
+            $impersonator = $event->impersonator;
+            /** @var User $impersonated */
+            $impersonated = $event->impersonated;
+
+            activity()
+                ->performedOn($impersonated)
+                ->causedBy($impersonator)
+                ->event('impersonate-keluar')
+                ->log('Berhenti menyamar sebagai '.$impersonated->name);
+        });
     }
 
     /** Perubahan data pegawai/riwayat memicu pembersihan cache statistik dasbor. */

@@ -22,6 +22,14 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null $nip
+ * @property string|null $nidn
+ * @property string|null $no_hp
+ * @property string|null $prodi_id
+ * @property bool $is_aktif
  * @property array<int, string>|null $app_authentication_recovery_codes
  * @property-read Pegawai|null $pegawai
  */
@@ -100,6 +108,24 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     public function wajibMfa(): bool
     {
         return $this->hasAnyRole([Peran::SuperAdmin->value, Peran::AdminKepegawaian->value]);
+    }
+
+    /** Hanya super-admin dapat memulai impersonate (stechstudio/filament-impersonate). */
+    public function canImpersonate(): bool
+    {
+        return $this->is_aktif && $this->hasRole(Peran::SuperAdmin->value);
+    }
+
+    /** Sesama super-admin dan klien API tidak dapat ditiru; akun nonaktif juga tidak. */
+    public function canBeImpersonated(): bool
+    {
+        return $this->is_aktif && ! $this->hasAnyRole([Peran::SuperAdmin->value, Peran::KlienApi->value]);
+    }
+
+    /** URL panel yang sesuai untuk pengguna ini, dipakai saat impersonate mengalihkan. */
+    public function urlPanelUtama(): string
+    {
+        return $this->can('swalayan.akses') && $this->pegawai()->exists() ? url('/saya') : url('/admin');
     }
 
     /**
