@@ -38,3 +38,19 @@ test('halaman eror tidak membocorkan jejak exception', function () {
         ->assertDontSee('Stack trace', escape: false)
         ->assertDontSee('vendor/laravel', escape: false);
 });
+
+test('setiap halaman eror memuat judul, saran, tombol beranda, dan tautan panduan', function (string $kode, string $judul) {
+    Route::get("/_tes-{$kode}", fn () => abort((int) $kode))->middleware('web');
+
+    $html = $this->get("/_tes-{$kode}")->assertStatus((int) $kode)->getContent();
+
+    expect($html)->toContain($kode)->toContain($judul)->toContain('Ke Beranda')->toContain('panduan/index.html')->toContain('class="saran"');
+})->with([
+    ['401', 'Anda belum masuk'],
+    ['403', 'Akses ditolak'],
+    ['404', 'Halaman tidak ditemukan'],
+    ['419', 'Sesi telah berakhir'],
+    ['429', 'Terlalu banyak permintaan'],
+    ['500', 'Terjadi kesalahan'],
+    ['503', 'Layanan tidak tersedia'],
+]);
