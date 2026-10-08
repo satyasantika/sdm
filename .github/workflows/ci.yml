@@ -86,6 +86,9 @@ jobs:
           # Test mengasumsikan root domain; subpath /sdm dari .env.example hanya untuk produksi.
           APP_URL: http://localhost
           SESSION_PATH: /
+          ASSET_URL: ''
+          REDIS_CACHE_DB: 1
+          REDIS_QUEUE_DB: 2
 
       - name: Optimasi produksi (memastikan config/route cache tidak gagal)
         run: composer produksi
