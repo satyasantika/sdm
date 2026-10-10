@@ -73,7 +73,32 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             return false;
         }
 
-        return app()->environment('local') || str_ends_with($this->email, '@unsil.ac.id');
+        return self::surelDiizinkan($this->email);
+    }
+
+    /** Akhiran surel yang diizinkan (config sdm.domain_surel). */
+    public static function surelDiizinkan(?string $surel): bool
+    {
+        if (app()->environment('local')) {
+            return true;
+        }
+
+        /** @var list<string> $domain */
+        $domain = config('sdm.domain_surel');
+
+        return array_any($domain, fn (string $akhiran): bool => str_ends_with(mb_strtolower((string) $surel), $akhiran));
+    }
+
+    /** Aturan validasi `ends_with` untuk surel pengguna; longgar di lingkungan local. */
+    public static function aturanDomainSurel(): string
+    {
+        return app()->environment('local') ? 'nullable' : 'ends_with:'.implode(',', config('sdm.domain_surel'));
+    }
+
+    /** Pesan galat domain surel, mis. "@unsil.ac.id atau @staff.unsil.ac.id". */
+    public static function pesanDomainSurel(): string
+    {
+        return 'Surel harus berakhiran '.implode(' atau ', config('sdm.domain_surel')).'.';
     }
 
     public function getAppAuthenticationSecret(): ?string
