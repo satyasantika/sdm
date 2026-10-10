@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn () => view('filament.auth.bantuan'))
             ->brandName('SDM FKIP Unsil')
             ->profile()
-            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()])
+            ->when(config('keamanan.mfa_aktif'), fn (Panel $panel) => $panel->multiFactorAuthentication([AppAuthentication::make()->recoverable()]))
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(PanelsRenderHook::FOOTER, fn () => new HtmlString('<div class="py-2 text-center text-xs text-gray-500">SDM FKIP Unsil · v'.e(config('app.version')).'</div>'))

@@ -15,12 +15,23 @@ function akun(Peran $peran, array $atribut = []): User
     return tap(User::factory()->create($atribut + ['email' => $peran->value.'@unsil.ac.id']), fn (User $u) => $u->assignRole($peran->value));
 }
 
+test('mfa dimatikan secara bawaan sehingga admin tanpa mfa langsung masuk dasbor', function () {
+    expect(config('keamanan.mfa_aktif'))->toBeFalse();
+
+    $this->actingAs(akun(Peran::AdminKepegawaian))->get('/admin')->assertOk();
+    $this->actingAs(akun(Peran::SuperAdmin))->get('/admin')->assertOk();
+});
+
 test('admin-kepegawaian tanpa mfa diarahkan ke halaman pengaktifan mfa', function () {
+    config(['keamanan.mfa_aktif' => true]);
+
     $this->actingAs(akun(Peran::AdminKepegawaian))->get('/admin')
         ->assertRedirect(url('/admin/profile'));
 });
 
 test('super-admin tanpa mfa juga diarahkan', function () {
+    config(['keamanan.mfa_aktif' => true]);
+
     $this->actingAs(akun(Peran::SuperAdmin))->get('/admin')->assertRedirect();
 });
 

@@ -5,6 +5,9 @@
  * ubah CSP_MODE=enforce setelah diuji manual di staging (lihat docs/DEPLOY.md).
  */
 return [
+    // Autentikasi dua faktor (TOTP) panel admin. Dimatikan sementara; set MFA_AKTIF=true untuk mengaktifkan kembali.
+    'mfa_aktif' => (bool) env('MFA_AKTIF', false),
+
     // off | report-only | enforce
     'csp_mode' => env('CSP_MODE', 'report-only'),
 

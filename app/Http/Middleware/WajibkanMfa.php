@@ -19,7 +19,7 @@ class WajibkanMfa
     {
         $user = $request->user();
 
-        if (! $user instanceof User || ! $user->wajibMfa() || filled($user->getAppAuthenticationSecret())) {
+        if (! config('keamanan.mfa_aktif') || ! $user instanceof User || ! $user->wajibMfa() || filled($user->getAppAuthenticationSecret())) {
             return $next($request);
         }
 
