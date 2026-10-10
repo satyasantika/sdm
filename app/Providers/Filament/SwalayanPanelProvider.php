@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\UbahProfil;
 use App\Filament\Swalayan\Pages\Beranda;
+use App\Http\Middleware\PaksaGantiSandi;
 use App\Http\Middleware\PastikanPersetujuanPrivasi;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -29,7 +31,7 @@ class SwalayanPanelProvider extends PanelProvider
             ->login()
             ->darkMode(false)
             ->passwordReset()
-            ->profile()
+            ->profile(UbahProfil::class)
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.samping', [
                 'judul' => 'Data Saya',
                 'subjudul' => 'Lihat profil kepegawaian Anda dan ajukan perubahan data dengan mudah.',
@@ -65,6 +67,7 @@ class SwalayanPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 PastikanPersetujuanPrivasi::class,
+                PaksaGantiSandi::class,
             ]);
     }
 }

@@ -69,6 +69,9 @@ class UserResource extends Resource
                 ->validationMessages(['required' => 'Program studi wajib diisi untuk peran Admin Prodi.']),
             Toggle::make('is_aktif')->label('Aktif')->default(true)
                 ->disabled(fn (?User $record): bool => $record?->is(auth()->user()) ?? false),
+            Toggle::make('wajib_ganti_sandi')->label('Wajib ganti sandi saat masuk')
+                ->helperText('Nyalakan untuk akun dengan kata sandi awal yang dibuat admin.')
+                ->default(true),
         ]);
     }
 

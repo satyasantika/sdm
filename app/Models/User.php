@@ -33,7 +33,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property array<int, string>|null $app_authentication_recovery_codes
  * @property-read Pegawai|null $pegawai
  */
-#[Fillable(['name', 'email', 'password', 'nip', 'nidn', 'prodi_id', 'no_hp', 'is_aktif'])]
+#[Fillable(['name', 'email', 'password', 'nip', 'nidn', 'prodi_id', 'no_hp', 'is_aktif', 'wajib_ganti_sandi'])]
 #[Hidden(['password', 'remember_token', 'app_authentication_secret', 'app_authentication_recovery_codes'])]
 class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
 {
@@ -164,6 +164,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_aktif' => 'boolean',
+            'wajib_ganti_sandi' => 'boolean',
             'app_authentication_secret' => 'encrypted',
             'app_authentication_recovery_codes' => 'encrypted:array',
             'last_login_at' => 'datetime',

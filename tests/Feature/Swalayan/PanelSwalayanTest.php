@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Peran;
+use App\Filament\Auth\UbahProfil;
 use App\Filament\Swalayan\Pages\Beranda;
 use App\Filament\Swalayan\Pages\PersetujuanPrivasi;
 use App\Filament\Swalayan\Pages\ProfilSaya;
@@ -13,6 +14,9 @@ use App\Support\Konfigurasi;
 use Database\Seeders\KonfigurasiSeeder;
 use Database\Seeders\PeranDanIzinSeeder;
 use Filament\Actions\Testing\TestAction;
+use Illuminate\Auth\Events\OtherDeviceLogout;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -129,4 +133,41 @@ test('halaman root mengarahkan sesuai peran', function () {
     $this->get('/')->assertOk()->assertSee('Panduan Pengguna');
     $this->actingAs($user)->get('/')->assertRedirect('/saya');
     $this->actingAs($admin)->get('/')->assertRedirect('/admin');
+});
+
+test('pengguna dengan wajib_ganti_sandi di panel swalayan diarahkan ke profil', function () {
+    [$user] = dosenSwalayan();
+    setujuiPrivasi($user);
+    $user->update(['wajib_ganti_sandi' => true]);
+
+    $this->actingAs($user)->get('/saya')->assertRedirect('/saya/profile');
+});
+
+test('mengganti sandi di profil swalayan mencabut kewajiban dan mengeluarkan perangkat lain', function () {
+    [$user] = dosenSwalayan();
+    setujuiPrivasi($user);
+    $user->update(['wajib_ganti_sandi' => true]);
+    $lama = $user->password;
+    Event::fake([OtherDeviceLogout::class]);
+
+    $this->actingAs($user);
+
+    Livewire::test(UbahProfil::class)
+        ->fillForm([
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => 'sandi-baru-123',
+            'passwordConfirmation' => 'sandi-baru-123',
+            'currentPassword' => 'password',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $user->refresh();
+    expect($user->wajib_ganti_sandi)->toBeFalse()
+        ->and($user->password)->not->toBe($lama)
+        ->and(Hash::check('sandi-baru-123', $user->password))->toBeTrue();
+    Event::assertDispatched(OtherDeviceLogout::class);
+
+    $this->get('/saya')->assertOk();
 });
