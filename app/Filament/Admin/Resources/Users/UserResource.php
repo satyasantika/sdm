@@ -6,6 +6,7 @@ use App\Enums\Peran;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
+use App\Filament\Admin\Resources\Users\Pages\TempelPengguna;
 use App\Filament\Admin\Resources\Users\Pages\ViewUser;
 use App\Models\Prodi;
 use App\Models\Role;
@@ -50,9 +51,9 @@ class UserResource extends Resource
             TextInput::make('email')->label('Surel')->email()->required()->maxLength(150)
                 ->unique(ignoreRecord: true)
                 ->rules([
-                    fn (): string => app()->environment('local') ? 'nullable' : 'ends_with:@unsil.ac.id',
+                    fn (): string => User::aturanDomainSurel(),
                 ])
-                ->validationMessages(['ends_with' => 'Surel harus berakhiran @unsil.ac.id.']),
+                ->validationMessages(['ends_with' => User::pesanDomainSurel()]),
             TextInput::make('password')->label('Kata sandi')->password()->revealable()
                 ->required(fn (string $operation): bool => $operation === 'create')
                 ->dehydrated(fn (?string $state): bool => filled($state))
@@ -112,6 +113,7 @@ class UserResource extends Resource
         return [
             'index' => ListUsers::route('/'),
             'create' => CreateUser::route('/create'),
+            'tempel' => TempelPengguna::route('/tempel'),
             'view' => ViewUser::route('/{record}'),
             'edit' => EditUser::route('/{record}/edit'),
         ];

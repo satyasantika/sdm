@@ -2,18 +2,13 @@
 
 namespace App\Filament\Imports;
 
+use App\Actions\Pengguna\SimpanPenggunaImpor;
 use App\Enums\Peran;
-use App\Models\Prodi;
 use App\Models\User;
-use App\Notifications\AkunSwalayanDibuat;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Filament\Facades\Filament;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Throwable;
 
@@ -37,7 +32,7 @@ class UserImporter extends Importer
                 ->rules(fn (?User $record) => [
                     'required', 'email', 'max:150',
                     Rule::unique('users', 'email')->ignore($record?->getKey()),
-                    fn (): string => app()->environment('local') ? 'nullable' : 'ends_with:@unsil.ac.id',
+                    fn (): string => User::aturanDomainSurel(),
                 ]),
             ImportColumn::make('peran')->label('Peran')->requiredMapping()->example('dosen')
                 ->rules(['required', Rule::in(self::peranDiizinkan())]),
@@ -57,7 +52,7 @@ class UserImporter extends Importer
             'email.required' => 'Surel wajib diisi.',
             'email.email' => 'Surel tidak valid.',
             'email.unique' => 'Surel sudah dipakai pengguna lain.',
-            'email.ends_with' => 'Surel harus berakhiran @unsil.ac.id.',
+            'email.ends_with' => User::pesanDomainSurel(),
             'peran.required' => 'Peran wajib diisi.',
             'peran.in' => 'Peran tidak dikenal atau tidak dapat dibuat lewat impor (super-admin dan klien-api tidak diizinkan).',
             'kode_prodi.exists' => 'Kode prodi tidak dikenal.',
@@ -79,43 +74,18 @@ class UserImporter extends Importer
         }
     }
 
-    public function fillRecord(): void
-    {
-        /** @var User $record */
-        $record = $this->record;
-        $record->name = $this->data['name'];
-        $record->email = $this->data['email'];
-        $record->nip = $this->data['nip'] ?? null;
-        $record->nidn = $this->data['nidn'] ?? null;
-        $record->no_hp = $this->data['no_hp'] ?? null;
-        $record->is_aktif = true;
-
-        if (filled($this->data['kode_prodi'] ?? null)) {
-            $record->prodi_id = Prodi::where('kode', $this->data['kode_prodi'])->value('id');
-        }
-    }
+    /** Pengisian atribut dilakukan Action pada saveRecord(). */
+    public function fillRecord(): void {}
 
     public function saveRecord(): void
     {
         /** @var User $record */
         $record = $this->record;
-        $baru = ! $record->exists;
-
-        if ($baru) {
-            $record->password = Str::password(32);
-        }
 
         try {
-            DB::transaction(fn () => $record->save());
+            app(SimpanPenggunaImpor::class)->handle($record, $this->data);
         } catch (Throwable $e) {
             throw new RowImportFailedException('Baris gagal disimpan: '.$e->getMessage());
-        }
-
-        $record->syncRoles([$this->data['peran']]);
-
-        if ($baru) {
-            $token = Password::broker()->createToken($record);
-            $record->notify(new AkunSwalayanDibuat(Filament::getPanel('admin')->getResetPasswordUrl($token, $record)));
         }
     }
 
