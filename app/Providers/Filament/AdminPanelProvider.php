@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Pages\Dasbor;
+use App\Filament\Auth\UbahProfil;
+use App\Http\Middleware\PaksaGantiSandi;
 use App\Http\Middleware\WajibkanMfa;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -42,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ]))
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn () => view('filament.auth.bantuan'))
             ->brandName('SDM FKIP Unsil')
-            ->profile()
+            ->profile(UbahProfil::class)
             ->when(config('keamanan.mfa_aktif'), fn (Panel $panel) => $panel->multiFactorAuthentication([AppAuthentication::make()->recoverable()]))
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
@@ -74,6 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 WajibkanMfa::class,
+                PaksaGantiSandi::class,
             ]);
     }
 }
