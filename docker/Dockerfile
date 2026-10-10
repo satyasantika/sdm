@@ -9,7 +9,9 @@ RUN npm ci --ignore-scripts
 COPY vite.config.js ./
 COPY resources ./resources
 COPY public ./public
-RUN npm run build
+# Subpath produksi (STANDAR-TEKNIS §2.4): ASSET_URL menjadi base Vite agar url() di CSS (font) berawalan /sdm/build/.
+ARG ASSET_URL=https://supportfkip.unsil.ac.id/sdm
+RUN ASSET_URL="$ASSET_URL" npm run build
 
 # ---- (b) dependensi composer ---------------------------------------------------------------------
 FROM composer:2 AS vendor
