@@ -6,6 +6,8 @@ x-app: &app
     context: .
     dockerfile: docker/Dockerfile
     target: app
+    args:
+      ASSET_URL: ${ASSET_URL:-https://supportfkip.unsil.ac.id/sdm}
   image: sdm-fkip/app:${APP_VERSION:-latest}
   env_file: .env
   environment: &app-env
@@ -52,6 +54,8 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: web
+      args:
+        ASSET_URL: ${ASSET_URL:-https://supportfkip.unsil.ac.id/sdm}
     image: sdm-fkip/web:${APP_VERSION:-latest}
     restart: unless-stopped
     ports:
