@@ -1,6 +1,15 @@
 # Panduan Deploy Produksi
 
-Stack: `compose.production.yaml` — enam container: `app` (PHP-FPM 8.4), `web` (Nginx), `queue` (Horizon), `scheduler`
+> **Keputusan 16 Oktober 2026 berlaku setelah Fase B** (PHP 8.5; MariaDB 10.11+ native di host, kolasi `utf8mb4_unicode_ci`, bukan container MySQL 8.4; SQLite tidak dipakai; STANDAR-TEKNIS §1, §2). Kondisi saat ini: image PHP 8.4 dan container `mysql` 8.4 pada `compose.production.yaml`, seperti dijelaskan di bawah.
+
+> **Butir Fase B (keputusan lanjutan 16 Oktober 2026):** (1) produksi memakai MariaDB NATIVE di host, dijangkau lewat `host.docker.internal` (`extra_hosts: ["host.docker.internal:host-gateway"]` pada `app` dan `scheduler`), sama dengan aplikasi produksi lain; `compose.production.yaml` TIDAK boleh memuat container database, sehingga service `mysql` (8.4) dihapus pada Fase B; (2) nama database `db_sdm` (uji: `db_sdm_testing`), nama pengguna DB tetap `sdm`; (3) `docker/Dockerfile` `php:8.4-fpm-alpine` menjadi PHP 8.5 dan `composer.json` `^8.3` menjadi `^8.5`; (4) `.env.example` dan `phpunit.xml` pindah dari SQLite ke MariaDB (`DB_CONNECTION=mariadb`); (5) alat cadangan `mariadb-dump` (docs/PEMULIHAN.md); (6) CI memakai service container sementara `mariadb:10.11` (`MARIADB_*`, `healthcheck.sh --connect --innodb_initialized`).
+
+> **Profil Ringan berlaku setelah Fase B** (STANDAR-TEKNIS §1b). Kondisi saat ini (berikut seluruh isi berkas ini) masih
+> memakai Horizon dan Redis. Target: tiga container (`app`, `web`, `scheduler` yang juga menjalankan worker antrean lewat
+> `queue:work --stop-when-empty`); basis data MariaDB 10.11+ native di host (bukan container `mysql`); tanpa `queue` dan `redis`; `QUEUE_CONNECTION`, `CACHE_STORE`, `SESSION_DRIVER` = `database`;
+> variabel `HORIZON_PATH` dan dasbor `/horizon` dihapus; pemantauan lewat `/api/health`.
+
+Stack saat ini: `compose.production.yaml` — enam container: `app` (PHP-FPM 8.4), `web` (Nginx), `queue` (Horizon), `scheduler`
 (`schedule:work`), `mysql` (8.4), `redis` (7, appendonly). Image dibangun dari `docker/Dockerfile` (target `app` dan `web`).
 
 ## 1. Persiapan `.env` produksi
@@ -14,7 +23,7 @@ Salin `.env.example` → `.env` di server, lalu isi (jangan commit; simpan salin
 | `APP_URL` | URL HTTPS publik |
 | `SESSION_SECURE_COOKIE` | `true` (HTTPS wajib) |
 | `CSP_MODE` | `report-only` dahulu; ubah ke `enforce` setelah diuji di staging (CSP mengizinkan skrip/gaya inline karena dibutuhkan Filament/Livewire) |
-| `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` | rahasia kuat (host `mysql` diatur compose) |
+| `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_ROOT_PASSWORD` | rahasia kuat (host `mysql` diatur compose). Berlaku setelah Fase B; kondisi saat ini: `DB_DATABASE` untuk container `mysql`. Target: `DB_CONNECTION=mariadb`, `DB_HOST=host.docker.internal`, `DB_DATABASE=db_sdm`, `DB_USERNAME=sdm`; `DB_ROOT_PASSWORD` tidak dipakai lagi (tidak ada container database) |
 | `MAIL_*`, `WHATSAPP_ENABLED` dst. | kredensial SMTP kampus; WhatsApp sesuai keputusan |
 | `SEED_SUPERADMIN_EMAIL`, `SEED_SUPERADMIN_PASSWORD` | akun super-admin awal (hapus kata sandi dari `.env` setelah dibuat) |
 | `TRUSTED_PROXIES` | IP/CIDR reverse proxy kampus (dipisah koma) agar HTTPS & IP klien dikenali; `*` hanya bila jaringan proxy terisolasi |
@@ -114,7 +123,7 @@ Migrasi berjalan otomatis di `app`. Untuk rollback: checkout tag sebelumnya, bui
 
 ## 7. Catatan keamanan operasional
 
-- Hanya `web` yang membuka port ke host; `mysql` dan `redis` tidak diekspos.
+- Hanya `web` yang membuka port ke host; `mysql` dan `redis` tidak diekspos. Setelah Fase B: tidak ada container database; MariaDB native di host hanya mendengarkan di `127.0.0.1` dan gateway Docker (`bind-address`, STANDAR-TEKNIS §2.2), pengguna DB dibatasi ke subnet Docker.
 - CORS API tertutup bawaan; isi `CORS_ALLOWED_ORIGINS` hanya bila perlu.
 - Pasang HTTPS di reverse proxy kampus dan teruskan `X-Forwarded-Proto`; isi `TRUSTED_PROXIES` di `.env`.
 - Hapus `SEED_SUPERADMIN_PASSWORD` dari `.env` setelah akun dibuat.

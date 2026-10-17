@@ -1,6 +1,6 @@
 # API Integrasi SDM FKIP (v1)
 
-API baca-saja untuk sistem Akreditasi, Keuangan, dan LMS. Hanya data non-sensitif (BR-17): tidak ada NIK, NIP, NPWP,
+API baca-saja untuk sistem Akreditasi, Keuangan, dan LMS (LMS ditunda per keputusan 15 Oktober 2026; klien LMS baru dibuat bila LMS dihidupkan lagi). Hanya data non-sensitif (BR-17): tidak ada NIK, NIP, NPWP,
 rekening, tanggal lahir, alamat, kontak pribadi, maupun data keluarga.
 
 ## Autentikasi

@@ -1,5 +1,7 @@
 # Catatan Kinerja
 
+> **Keputusan 16 Oktober 2026 berlaku setelah Fase B** (PHP 8.5; MariaDB 10.11+ native di host, kolasi `utf8mb4_unicode_ci`, bukan container MySQL 8.4; SQLite tidak dipakai; STANDAR-TEKNIS §1, §2). Kondisi saat ini: angka di bawah diukur pada SQLite in-memory; pengukuran ulang pada MariaDB 10.11+ (database `db_sdm`, kolom UUID native) di staging diperlukan sebelum go-live.
+
 Pengukuran memakai `BebanUjiSeeder` (1.000 pegawai, masing-masing 1 riwayat pendidikan, 1 sertifikasi, 5 dokumen, BKD untuk
 2 semester → 5.000 dokumen) dan tes `tests/Feature/Kinerja/UkurKinerjaTest.php`.
 
@@ -21,7 +23,7 @@ APP_UKUR_KINERJA=1 ./vendor/bin/pest tests/Feature/Kinerja/UkurKinerjaTest.php
 Target PRD (daftar pegawai ≤ 2 dtk untuk 1.000 pegawai) **terpenuhi** dengan margin besar.
 
 **Catatan:** angka ini diukur pada SQLite tanpa latensi jaringan dan tanpa render browser; waktu nyata di produksi (MySQL 8.4,
-Redis, PHP-FPM) lebih besar. Ulangi pengukuran di staging dengan `BebanUjiSeeder` sebelum go-live dan catat hasilnya di sini.
+PHP-FPM; Redis hingga Fase B, setelahnya cache di MySQL) lebih besar. Ulangi pengukuran di staging dengan `BebanUjiSeeder` sebelum go-live dan catat hasilnya di sini.
 Hanya SQLite yang diuji dalam sesi ini; MySQL belum diukur.
 
 ## Batas jumlah kueri (diuji otomatis di `JumlahKueriTest`)
