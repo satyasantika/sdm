@@ -74,10 +74,3 @@ test('super-admin tidak bisa menonaktifkan akunnya sendiri', function () {
     expect($admin->fresh()->is_aktif)->toBeTrue()
         ->and(fn () => $admin->delete())->toThrow(LogicException::class);
 });
-
-test('horizon 403 untuk admin-kepegawaian dan terbuka untuk super-admin di production', function () {
-    $this->app['env'] = 'production';
-
-    $this->actingAs(akun(Peran::AdminKepegawaian))->get('/horizon')->assertForbidden();
-    $this->actingAs(akun(Peran::SuperAdmin))->get('/horizon')->assertOk();
-});

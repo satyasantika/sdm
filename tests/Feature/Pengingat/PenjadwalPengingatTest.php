@@ -25,7 +25,6 @@ use Filament\Actions\Testing\TestAction;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -83,17 +82,16 @@ test('tandai kedaluwarsa memperbarui dokumen sertifikasi dan pengingat lewat tan
         ->and(Artisan::output())->toContain('Dokumen diperbarui: 1');
 });
 
-test('hitung pengingat tidak dispatch bila lock dipegang', function () {
+test('hitung pengingat mengantrekan job dan jadwalnya dijaga withoutOverlapping + onOneServer', function () {
     Queue::fake([HitungUlangPengingat::class]);
-    $lock = Cache::lock('sdm:lock:pengingat-harian', 1800);
-    expect($lock->get())->toBeTrue();
 
     Artisan::call('sdm:hitung-pengingat');
-    Queue::assertNotPushed(HitungUlangPengingat::class);
+    Queue::assertPushed(HitungUlangPengingat::class, 1);
 
-    $lock->release();
-    Artisan::call('sdm:hitung-pengingat');
-    Queue::assertPushed(HitungUlangPengingat::class);
+    $acara = collect(app(Schedule::class)->events())->first(fn ($e) => str_contains((string) $e->command, 'sdm:hitung-pengingat'));
+
+    expect($acara->withoutOverlapping)->toBeTrue()
+        ->and($acara->onOneServer)->toBeTrue();
 });
 
 test('periksa tautan mengantrekan sensitif lebih dahulu dan menghormati interval', function () {

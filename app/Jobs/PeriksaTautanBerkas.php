@@ -26,7 +26,7 @@ class PeriksaTautanBerkas implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public readonly string $tautanId)
     {
-        $this->onQueue('tautan');
+        $this->onQueue('default');
     }
 
     public function uniqueId(): string

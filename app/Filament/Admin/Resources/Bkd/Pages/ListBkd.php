@@ -33,7 +33,12 @@ class ListBkd extends ListRecords
         return [BkdRingkasanWidget::class];
     }
 
-    /** Kunci lock impor BKD per semester (BR-22); dilepas saat ImportCompleted atau habis TTL 15 menit. */
+    /**
+     * Kunci lock impor BKD per semester (BR-22); dilepas saat ImportCompleted atau habis TTL 15 menit.
+     * Sengaja tetap memakai lock cache (store database, atomik lewat PRIMARY KEY cache_locks): kunci harus bertahan
+     * melewati permintaan ini sampai job impor selesai, sehingga DB::transaction + lockForUpdate tidak dapat
+     * menggantikannya tanpa kolom penanda baru di tabel semester (keputusan terbuka, lihat laporan Fase B).
+     */
     public static function kunciLock(string $semesterId): string
     {
         return 'sdm:lock:impor-bkd:'.$semesterId;

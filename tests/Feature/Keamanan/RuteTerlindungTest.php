@@ -33,7 +33,7 @@ test('semua rute selain daftar publik memiliki middleware autentikasi', function
 test('rute livewire dan storage tidak membuka berkas atau data tanpa login', function () {
     expect($this->get('/storage/apa-saja.txt')->status())->toBeIn([403, 404]);
     expect($this->get('/filament/exports/'.fake()->uuid().'/download')->status())->toBeIn([401, 403, 404, 302]);
-    $this->get('/horizon')->assertForbidden();
+    $this->get('/horizon')->assertNotFound();
     $this->get('/admin')->assertRedirect();
     $this->get('/saya')->assertRedirect();
     $this->getJson('/api/user')->assertUnauthorized();

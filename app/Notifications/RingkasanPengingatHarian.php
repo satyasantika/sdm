@@ -20,7 +20,7 @@ class RingkasanPengingatHarian extends Notification implements ShouldQueue
     /** @param  Collection<int, Pengingat>  $pengingat */
     public function __construct(public readonly Collection $pengingat, public readonly ?string $namaProdi = null)
     {
-        $this->onQueue('notifikasi');
+        $this->onQueue('default');
     }
 
     /** @return list<string> */

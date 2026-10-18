@@ -18,9 +18,15 @@ test('pesan validasi berbahasa indonesia', function () {
     expect($pesan)->toBe('Isian nama wajib diisi.');
 });
 
-test('redis memakai database terpisah untuk cache dan antrean', function () {
-    expect((string) config('database.redis.cache.database'))->toBe('1')
-        ->and((string) config('database.redis.queue.database'))->toBe('2')
-        ->and(config('queue.connections.redis.connection'))->toBe('queue')
-        ->and(config('queue.connections.redis.retry_after'))->toBe(660);
+test('antrean database memakai dua koneksi dengan retry_after di atas timeout worker', function () {
+    $ringan = config('queue.connections.database');
+    $berat = config('queue.connections.database-berat');
+
+    expect($ringan['driver'])->toBe('database')
+        ->and($ringan['after_commit'])->toBeTrue()
+        ->and($ringan['retry_after'])->toBeGreaterThan(60)
+        ->and($berat['driver'])->toBe('database')
+        ->and($berat['queue'])->toBe('berat')
+        ->and($berat['after_commit'])->toBeTrue()
+        ->and($berat['retry_after'])->toBeGreaterThan(900);
 });

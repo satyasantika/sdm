@@ -1,5 +1,14 @@
-# Stack produksi SDM FKIP (F10.3). Semua rahasia dari .env (env_file); tidak ada nilai rahasia di berkas ini.
+# Stack produksi SDM FKIP (F10.3), Profil Ringan: STANDAR-TEKNIS §1b dan §7. Semua rahasia dari .env (env_file); tidak ada nilai rahasia di berkas ini.
 # Jalankan: docker compose -f compose.production.yaml up -d --build
+# MariaDB berjalan NATIVE di host (DB_HOST=host.docker.internal). Compose ini TIDAK memuat container database,
+# Redis, atau Horizon/queue; antrean, cache, dan sesi memakai database, worker dinyalakan penjadwal (routes/console.php).
+
+# Log Docker dirotasi (STANDAR-TEKNIS §7.1).
+x-log: &log
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
 
 x-app: &app
   build:
@@ -13,32 +22,31 @@ x-app: &app
   environment: &app-env
     APP_ENV: production
     APP_DEBUG: "false"
-    DB_CONNECTION: mysql
-    DB_HOST: mysql
+    DB_CONNECTION: mariadb
+    DB_HOST: host.docker.internal
     DB_PORT: "3306"
-    REDIS_HOST: redis
     # nginx (jaringan docker) dipercaya agar X-Forwarded-Proto/-Prefix dari reverse proxy kampus dihormati
     TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
-    CACHE_STORE: redis
-    SESSION_DRIVER: redis
-    QUEUE_CONNECTION: redis
+    CACHE_STORE: database
+    SESSION_DRIVER: database
+    QUEUE_CONNECTION: database
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
   restart: unless-stopped
+  logging: *log
   volumes:
     - storage:/var/www/html/storage
-  depends_on:
-    mysql:
-      condition: service_healthy
-    redis:
-      condition: service_healthy
 
 services:
   app:
     <<: *app
+    # Batas memori: nilai awal (perkiraan); wajib dibuktikan dengan `docker stats` (STANDAR-TEKNIS §7.1).
+    mem_limit: 512m
     environment:
       <<: *app-env
       RUN_MIGRATIONS: "true"
     healthcheck:
-      # memanggil /api/health langsung ke PHP-FPM lewat FastCGI
+      # memanggil /api/health langsung ke PHP-FPM lewat FastCGI (503 hanya bila DB gagal)
       test:
         - CMD-SHELL
         - >-
@@ -58,58 +66,24 @@ services:
         ASSET_URL: ${ASSET_URL:-https://supportfkip.unsil.ac.id/sdm}
     image: sdm-fkip/web:${APP_VERSION:-latest}
     restart: unless-stopped
+    mem_limit: 64m
+    logging: *log
     ports:
       - "${WEB_PORT:-8080}:80"
     depends_on:
       app:
         condition: service_healthy
 
-  queue:
+  # Penjadwal sekaligus pemicu worker antrean (routes/console.php: queue:work tiap menit, --stop-when-empty).
+  # Worker berjalan sebagai subproses di container ini: batas memori mencakup worker default dan worker berat (--memory=512).
+  scheduler:
     <<: *app
-    command: ["php", "artisan", "horizon"]
+    command: ["php", "artisan", "schedule:work"]
+    mem_limit: 768m
     stop_grace_period: 60s
     depends_on:
       app:
         condition: service_healthy
 
-  scheduler:
-    <<: *app
-    command: ["php", "artisan", "schedule:work"]
-    depends_on:
-      app:
-        condition: service_healthy
-
-  mysql:
-    image: mysql:8.4
-    restart: unless-stopped
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?isi DB_ROOT_PASSWORD di .env}
-    volumes:
-      - mysql:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 30s
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
 volumes:
   storage:
-  mysql:
-  redis:

@@ -50,6 +50,11 @@ class BebanKerjaDtpsExporter extends Exporter
 
     public function getJobQueue(): ?string
     {
-        return 'ekspor';
+        return 'berat';
+    }
+
+    public function getJobConnection(): ?string
+    {
+        return 'database-berat';
     }
 }

@@ -19,7 +19,7 @@ class BuatPdfLaporan implements ShouldQueue
 
     public function __construct(public readonly string $jenis, public readonly string $userId)
     {
-        $this->onQueue('ekspor');
+        $this->onConnection('database-berat')->onQueue('berat');
     }
 
     public function handle(SusunLaporanKepegawaian $susun): void

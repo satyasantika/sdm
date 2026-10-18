@@ -103,6 +103,11 @@ class UserImporter extends Importer
 
     public function getJobQueue(): ?string
     {
-        return 'impor';
+        return 'berat';
+    }
+
+    public function getJobConnection(): ?string
+    {
+        return 'database-berat';
     }
 }

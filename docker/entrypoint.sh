@@ -4,8 +4,10 @@ set -e
 
 cd /var/www/html
 
-if [ "${DB_CONNECTION:-mysql}" = "mysql" ]; then
-    echo "Menunggu database ${DB_HOST:-mysql}:${DB_PORT:-3306} ..."
+# MariaDB native di host (DB_HOST=host.docker.internal). Driver Laravel "mariadb" dan "mysql" memakai DSN PDO yang sama.
+case "${DB_CONNECTION:-mariadb}" in
+mariadb | mysql)
+    echo "Menunggu database ${DB_HOST:-host.docker.internal}:${DB_PORT:-3306} ..."
     tries=0
     until php -r '
         try { new PDO("mysql:host=".getenv("DB_HOST").";port=".(getenv("DB_PORT") ?: 3306), getenv("DB_USERNAME"), getenv("DB_PASSWORD")); exit(0); }
@@ -15,7 +17,8 @@ if [ "${DB_CONNECTION:-mysql}" = "mysql" ]; then
         if [ "$tries" -ge 60 ]; then echo "Database tidak tersedia setelah 120 detik." >&2; exit 1; fi
         sleep 2
     done
-fi
+    ;;
+esac
 
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     php artisan migrate --force

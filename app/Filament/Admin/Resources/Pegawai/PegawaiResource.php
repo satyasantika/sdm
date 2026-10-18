@@ -202,7 +202,7 @@ class PegawaiResource extends Resource
             ->columns([
                 TextColumn::make('nama_bergelar')->label('Nama')
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhere(function (Builder $q) use ($search): void {
-                        DB::getDriverName() === 'mysql' ? $q->whereFullText('nama', $search)->orWhere('nama', 'like', "%{$search}%") : $q->where('nama', 'like', "%{$search}%");
+                        in_array(DB::getDriverName(), ['mysql', 'mariadb'], true) ? $q->whereFullText('nama', $search)->orWhere('nama', 'like', "%{$search}%") : $q->where('nama', 'like', "%{$search}%");
                     }))
                     ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('nama', $direction)),
                 TextColumn::make('nip')->label('NIP')->searchable()->placeholder('-'),

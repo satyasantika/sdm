@@ -157,7 +157,7 @@ test('pdf besar dibuat lewat job di antrean ekspor', function () {
 
     Livewire::test(LaporanKepegawaian::class)->callAction('dukPdf');
 
-    Queue::assertPushed(BuatPdfLaporan::class, fn (BuatPdfLaporan $job) => $job->queue === 'ekspor' && $job->jenis === 'duk');
+    Queue::assertPushed(BuatPdfLaporan::class, fn (BuatPdfLaporan $job) => $job->queue === 'berat' && $job->connection === 'database-berat' && $job->jenis === 'duk');
 });
 
 test('job pdf menyimpan berkas sementara dan hanya pembuat yang dapat mengunduh', function () {
