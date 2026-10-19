@@ -7,6 +7,19 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+### Diubah
+
+- Dokumentasi diselaraskan ke Keputusan Pemilik 16 Oktober 2026 (lanjutan): nama database `db_sdm`/`db_sdm_testing`; kolom UUID bertipe native MariaDB (klaim `CHAR(36)` dihapus,
+  gerbang uji skema UUID ditambahkan); produksi memakai MariaDB native di host lewat `host.docker.internal` (container `mysql` di `compose.production.yaml` ditandai butir Fase B);
+  cadangan `mariadb-dump`; CI `MARIADB_*`; antrean `ekspor` lama di `vibecoding/04` dikoreksi menjadi `berat`; butir Fase B dicatat (Dockerfile PHP 8.4, `composer.json ^8.3`,
+  blok Boost PHP 8.4 digenerate ulang oleh `boost:install`, `.env.example`/`phpunit.xml` SQLite). Kode belum diubah.
+- Dokumentasi diselaraskan ke Keputusan Pemilik 16 Oktober 2026 (STANDAR-TEKNIS): PHP 8.5, MariaDB 10.11+ native (bukan MySQL 8.4/container), kolasi `utf8mb4_unicode_ci`, SQLite tidak dipakai, `DB_CONNECTION=mariadb`.
+  Berkas `vibecoding/*.md` (+ salinan `vibecoding/docs/`), `README.md`, `CLAUDE.md`, `docs/DEPLOY.md`, `docs/OPERASI.md`, `docs/PEMULIHAN.md`, `docs/KINERJA.md`, `docs/KEPUTUSAN.md`; penanda "berlaku setelah Fase B" untuk kondisi produksi saat ini; kode belum diubah.
+- Dokumentasi diselaraskan ke Profil Ringan (STANDAR-TEKNIS §1b, 15 Oktober 2026): tanpa Redis/Horizon/Octane, antrean/cache/sesi/lock di MySQL,
+  worker dinyalakan penjadwal, `/api/health` untuk pemantauan. `CLAUDE.md`, `docs/DEPLOY.md`, `docs/OPERASI.md`, `docs/PEMULIHAN.md`,
+  `docs/KINERJA.md`, `docs/API.md`, `docs/STANDAR-GIT.md` diberi penanda "berlaku setelah Fase B"; kode belum diubah.
+- `vibecoding/README.md`: total langkah di tabel fase dikoreksi 58 menjadi 61 (sesuai jumlah `### F` di `04-PROMPT-BERTAHAP.md`).
+
 ## [1.0.0] - 2026-10-06
 
 Rilis produksi pertama (kandidat; tag menunggu keputusan pengelola).

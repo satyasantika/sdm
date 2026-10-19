@@ -12,7 +12,7 @@ class PeranDanIzinSeeder extends Seeder
 {
     /** @var list<string> */
     public const IZIN = [
-        'pengguna.kelola', 'audit.lihat', 'horizon.lihat', 'api.kelola-token', 'api.baca',
+        'pengguna.kelola', 'audit.lihat', 'api.kelola-token', 'api.baca',
         'master.lihat', 'master.kelola', 'konfigurasi.kelola',
         'pegawai.lihat', 'pegawai.buat', 'pegawai.ubah', 'pegawai.hapus', 'pegawai.ekspor', 'pegawai.impor', 'pegawai.lihat-sensitif',
         'riwayat.lihat', 'riwayat-akademik.kelola', 'riwayat-kepegawaian.kelola',
@@ -27,7 +27,7 @@ class PeranDanIzinSeeder extends Seeder
     ];
 
     private const BUKAN_ADMIN_KEPEGAWAIAN = [
-        'pengguna.kelola', 'horizon.lihat', 'api.kelola-token', 'api.baca', 'swalayan.akses',
+        'pengguna.kelola', 'api.kelola-token', 'api.baca', 'swalayan.akses',
     ];
 
     public function run(): void

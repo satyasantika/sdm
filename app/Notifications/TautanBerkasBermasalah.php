@@ -15,7 +15,7 @@ class TautanBerkasBermasalah extends Notification implements ShouldQueue
 
     public function __construct(public readonly TautanBerkas $tautan, public readonly StatusCekTautan $status)
     {
-        $this->onQueue('notifikasi');
+        $this->onQueue('default');
     }
 
     /** @return list<string> */

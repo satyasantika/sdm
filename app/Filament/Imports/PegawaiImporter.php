@@ -142,7 +142,12 @@ class PegawaiImporter extends Importer
 
     public function getJobQueue(): ?string
     {
-        return 'impor';
+        return 'berat';
+    }
+
+    public function getJobConnection(): ?string
+    {
+        return 'database-berat';
     }
 
     private static function tanggal(?string $state): ?string

@@ -13,7 +13,7 @@ class AkunSwalayanDibuat extends Notification implements ShouldQueue
 
     public function __construct(public readonly string $urlAturKataSandi)
     {
-        $this->onQueue('notifikasi');
+        $this->onQueue('default');
     }
 
     /** @return list<string> */

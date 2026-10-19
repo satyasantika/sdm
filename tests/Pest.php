@@ -52,3 +52,11 @@ function something()
 
 // Tes tidak boleh menembak jaringan nyata (mis. PeriksaTautanBerkas); gunakan Http::fake().
 pest()->beforeEach(fn () => Http::preventStrayRequests())->in('Feature', 'Arch');
+
+// Import/Export Filament memaksa koneksi antrean 'database-berat' (Profil Ringan, job berat
+// dipisah dari antrean default) lewat getJobConnection(), sehingga override QUEUE_CONNECTION=sync
+// di phpunit.xml tidak berlaku untuknya. Jalankan sinkron HANYA di folder test yang memicu
+// impor/ekspor nyata, supaya KonfigurasiDasarTest (yang mengecek config asli driver=database)
+// tidak ikut terdampak.
+pest()->beforeEach(fn () => config(['queue.connections.database-berat.driver' => 'sync']))
+    ->in('Feature/Auth', 'Feature/Bkd', 'Feature/Laporan', 'Feature/Pegawai', 'Feature/Uat');

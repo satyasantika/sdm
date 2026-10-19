@@ -104,7 +104,12 @@ class BkdImporter extends Importer
 
     public function getJobQueue(): ?string
     {
-        return 'impor';
+        return 'berat';
+    }
+
+    public function getJobConnection(): ?string
+    {
+        return 'database-berat';
     }
 
     /** "12,5" → 12.5 (format Indonesia). */

@@ -8,38 +8,31 @@ use App\Exceptions\UsulanSedangDiproses;
 use App\Models\User;
 use App\Models\UsulanPerubahan;
 use Closure;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-/** Dasar aksi verifikasi: lock Redis per usulan (BR-06), transaksi, muat ulang lockForUpdate, wajib berstatus diajukan. */
+/**
+ * Dasar aksi verifikasi (BR-06, STANDAR-TEKNIS §1b): tanpa kunci cache; di dalam DB::transaction usulan dimuat ulang
+ * dengan lockForUpdate sehingga keputusan bersamaan diserialkan, dan usulan wajib masih berstatus diajukan.
+ */
 abstract class KeputusanUsulan
 {
-    /** @param  Closure(UsulanPerubahan): mixed  $isi  dijalankan di dalam lock + transaksi pada usulan yang sudah di-lock */
+    /** @param  Closure(UsulanPerubahan): mixed  $isi  dijalankan di dalam transaksi pada usulan yang sudah di-lock */
     protected function jalankan(UsulanPerubahan $usulan, Closure $isi): UsulanPerubahan
     {
-        $lock = Cache::lock('sdm:lock:usulan:'.$usulan->getKey(), 30);
+        return DB::transaction(function () use ($usulan, $isi): UsulanPerubahan {
+            $terkini = UsulanPerubahan::query()->lockForUpdate()->findOrFail($usulan->getKey());
 
-        if (! $lock->get()) {
-            throw new UsulanSedangDiproses('Usulan sedang diproses pengguna lain.');
-        }
+            if ($terkini->status !== StatusUsulan::Diajukan) {
+                // Draf: belum pernah diajukan. Selain itu: sudah diputuskan/ditarik pengguna lain.
+                throw $terkini->status === StatusUsulan::Draf
+                    ? new TransisiUsulanTidakSah("Usulan berstatus {$terkini->status->getLabel()}; hanya usulan Diajukan yang dapat diputuskan.")
+                    : new UsulanSedangDiproses('Usulan sudah/sedang diproses pengguna lain.');
+            }
 
-        try {
-            $hasil = DB::transaction(function () use ($usulan, $isi): UsulanPerubahan {
-                $terkini = UsulanPerubahan::query()->lockForUpdate()->findOrFail($usulan->getKey());
+            $isi($terkini);
 
-                if ($terkini->status !== StatusUsulan::Diajukan) {
-                    throw new TransisiUsulanTidakSah("Usulan berstatus {$terkini->status->getLabel()}; hanya usulan Diajukan yang dapat diputuskan.");
-                }
-
-                $isi($terkini);
-
-                return $terkini->refresh();
-            });
-        } finally {
-            $lock->release();
-        }
-
-        return $hasil;
+            return $terkini->refresh();
+        });
     }
 
     /** @param  array<string, mixed>  $atribut */

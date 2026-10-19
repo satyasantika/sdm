@@ -8,7 +8,7 @@ use App\Filament\Admin\Resources\Users\UserResource;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /** Impor massal pengguna dengan menempel (copy-paste) dari Excel, dengan pratinjau sebelum disimpan. */
@@ -56,33 +56,27 @@ class TempelPengguna extends Page
             return;
         }
 
-        $kunci = Cache::lock('sdm:lock:impor-pengguna', 120);
-
-        if (! $kunci->get()) {
-            Notification::make()->title('Impor lain sedang berjalan, coba lagi sebentar')->warning()->send();
-
-            return;
-        }
-
+        // §1b: tanpa kunci cache. Tiap baris: transaksi + lockForUpdate pada akun yang sudah ada;
+        // indeks UNIQUE users.email menjaga bila dua impor menambah email baru yang sama (baris kedua dihitung gagal).
         $berhasil = 0;
         $gagal = 0;
 
-        try {
-            foreach ($hasil['baris'] as $baris) {
-                if (! $baris['valid']) {
-                    continue;
-                }
-
-                try {
-                    app(SimpanPenggunaImpor::class)->handle(User::firstWhere('email', $baris['data']['email']) ?? new User, $baris['data']);
-                    $berhasil++;
-                } catch (Throwable $e) {
-                    report($e);
-                    $gagal++;
-                }
+        foreach ($hasil['baris'] as $baris) {
+            if (! $baris['valid']) {
+                continue;
             }
-        } finally {
-            $kunci->release();
+
+            try {
+                DB::transaction(function () use ($baris): void {
+                    $pengguna = User::query()->where('email', $baris['data']['email'])->lockForUpdate()->first() ?? new User;
+
+                    app(SimpanPenggunaImpor::class)->handle($pengguna, $baris['data']);
+                });
+                $berhasil++;
+            } catch (Throwable $e) {
+                report($e);
+                $gagal++;
+            }
         }
 
         activity()->causedBy(auth()->user())->event('impor-pengguna-tempel')

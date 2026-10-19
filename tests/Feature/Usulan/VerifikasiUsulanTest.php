@@ -30,7 +30,6 @@ use Database\Seeders\MasterJabatanSeeder;
 use Database\Seeders\MasterPendukungSeeder;
 use Database\Seeders\PeranDanIzinSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -155,17 +154,16 @@ test('kembalikan memungkinkan pengusul mengirim ulang', function () {
     expect($lagi->status)->toBe(StatusUsulan::Diajukan);
 });
 
-test('lock redis menolak pemrosesan bersamaan', function () {
-    [$user, $pegawai] = pengusulDosen();
-    $usulan = usulanDiajukan($user, $pegawai);
-    $lock = Cache::lock('sdm:lock:usulan:'.$usulan->id, 30);
-    expect($lock->get())->toBeTrue();
-
-    expect(fn () => app(SetujuiUsulanPerubahan::class)->handle($usulan, verifikator()))->toThrow(UsulanSedangDiproses::class);
-
-    $lock->release();
+test('lock database: usulan yang sudah diputuskan tidak dapat diputuskan lagi dan diterapkan sekali', function () {
     Notification::fake();
+    [$user, $pegawai] = pengusulDosen(['no_hp' => '081111111111']);
+    $usulan = usulanDiajukan($user, $pegawai);
+    $salinanBasi = UsulanPerubahan::findOrFail($usulan->id);
+
     expect(app(SetujuiUsulanPerubahan::class)->handle($usulan, verifikator())->status)->toBe(StatusUsulan::Disetujui);
+
+    expect(fn () => app(SetujuiUsulanPerubahan::class)->handle($salinanBasi, verifikator()))->toThrow(UsulanSedangDiproses::class)
+        ->and(fn () => app(TolakUsulanPerubahan::class)->handle($salinanBasi, verifikator(), 'Sudah diputuskan pengguna lain.'))->toThrow(UsulanSedangDiproses::class);
 });
 
 test('hanya usulan berstatus diajukan yang dapat diputuskan', function () {

@@ -2,6 +2,14 @@
 
 Untuk super-admin dan operator server. Perintah `docker compose` memakai `-f compose.production.yaml`.
 
+> **Keputusan 16 Oktober 2026 berlaku setelah Fase B** (PHP 8.5; MariaDB 10.11+ native di host, kolasi `utf8mb4_unicode_ci`, bukan container MySQL 8.4; SQLite tidak dipakai; STANDAR-TEKNIS §1, §2). Kondisi saat ini: basis data masih container `mysql` 8.4 dan image PHP 8.4. Keputusan lanjutan: nama database `db_sdm`, MariaDB native di host lewat `host.docker.internal`, tanpa container database di compose produksi, cadangan dengan `mariadb-dump` (docs/PEMULIHAN.md); semuanya butir Fase B.
+
+> **Profil Ringan berlaku setelah Fase B** (STANDAR-TEKNIS §1b). Kondisi saat ini: Horizon + Redis seperti §1-§2 di bawah.
+> Setelah Fase B: tidak ada Horizon/container `queue`; worker dinyalakan penjadwal tiap menit; pantau lewat `/api/health`
+> (DB, job tertunda > 10 menit, `failed_jobs` 24 jam, detak penjadwal), ulang job gagal dengan `php artisan queue:failed` lalu
+> `queue:retry <id>`, dan tidak perlu `horizon:terminate` setelah deploy (worker berumur ≤ 1 menit). Super-admin menerima
+> notifikasi database harian bila ada job gagal.
+
 ## 1. Memantau antrean (Horizon)
 
 - Buka `/horizon` (di produksi sub-path: `/sdm/horizon`; hanya super-admin). Lima supervisor harus aktif: `default`, `impor`, `ekspor`, `notifikasi`, `tautan`.
@@ -46,7 +54,7 @@ Setiap penampilan data sensitif tercatat di **Sistem → Log Audit** (jenis `aks
 
 ## 6. Token API
 
-**Sistem → Token API → Buat token klien.** Satu klien per sistem (Akreditasi, Keuangan, LMS). Token polos tampil sekali. Cabut
+**Sistem → Token API → Buat token klien.** Satu klien per sistem (Akreditasi, Keuangan; LMS ditunda sejak 15 Oktober 2026). Token polos tampil sekali. Cabut
 bila bocor atau tidak dipakai; token berlaku 365 hari (jadwalkan penggantian). Lihat docs/API.md.
 
 ## 7. Insiden dan pemulihan
@@ -60,6 +68,6 @@ bila bocor atau tidak dipakai; token berlaku 365 hari (jadwalkan penggantian). L
 
 | Kapan | Periksa |
 |---|---|
-| Harian | `/api/health` ok; Horizon tanpa job gagal; ringkasan pengingat admin terkirim 07:00. |
+| Harian | `/api/health` ok; Horizon tanpa job gagal (setelah Fase B: `/api/health` tanpa peringatan antrean/penjadwal); ringkasan pengingat admin terkirim 07:00. |
 | Mingguan | Hasil `sdm:periksa-tautan`; ukuran log; backup terbaru dapat dibaca (`gunzip -t`). |
 | Semester | Impor BKD; jumlah mahasiswa; uji pulihkan; `composer audit` / `npm audit`; tinjau akun klien API. |

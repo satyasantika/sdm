@@ -39,8 +39,7 @@ test('admin-kepegawaian tidak memiliki izin sistem', function () {
     $peran = Role::findByName(Peran::AdminKepegawaian->value);
 
     expect($peran->hasPermissionTo('audit.lihat'))->toBeTrue()
-        ->and($peran->hasPermissionTo('pengguna.kelola'))->toBeFalse()
-        ->and($peran->hasPermissionTo('horizon.lihat'))->toBeFalse();
+        ->and($peran->hasPermissionTo('pengguna.kelola'))->toBeFalse();
 });
 
 test('dosen saja ditolak membuka admin', function () {

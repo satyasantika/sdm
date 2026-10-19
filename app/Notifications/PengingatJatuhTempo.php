@@ -21,7 +21,7 @@ class PengingatJatuhTempo extends Notification implements ShouldQueue
 
     public function __construct(public readonly Pengingat $pengingat, public readonly bool $untukPegawai = true)
     {
-        $this->onQueue('notifikasi');
+        $this->onQueue('default');
     }
 
     /** @return list<string> */

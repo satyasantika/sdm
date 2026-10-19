@@ -17,7 +17,7 @@ class UsulanDiajukan extends Notification implements ShouldQueue
 
     public function __construct(public readonly UsulanPerubahan $usulan)
     {
-        $this->onQueue('notifikasi');
+        $this->onQueue('default');
     }
 
     /** @return list<string> */

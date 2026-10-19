@@ -24,7 +24,7 @@ return [
     | used by your application. An example configuration is provided for
     | each backend supported by Laravel. You're also free to add more.
     |
-    | Drivers: "sync", "database", "beanstalkd", "sqs", "redis",
+    | Drivers: "sync", "database", "beanstalkd", "sqs",
     |          "deferred", "background", "failover", "null"
     |
     */
@@ -41,7 +41,17 @@ return [
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
             'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
-            'after_commit' => false,
+            'after_commit' => true,
+        ],
+
+        // Job berat (impor, ekspor, render besar). retry_after harus > --timeout worker (900 detik).
+        'database-berat' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => 'berat',
+            'retry_after' => 960,
+            'after_commit' => true,
         ],
 
         'beanstalkd' => [
@@ -64,18 +74,12 @@ return [
             'after_commit' => false,
         ],
 
-        'redis' => [
-            'driver' => 'redis',
-            'connection' => env('REDIS_QUEUE_CONNECTION', 'queue'),
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 660),
-            'block_for' => null,
-            'after_commit' => false,
-        ],
-
         'deferred' => [
             'driver' => 'deferred',
         ],
+
+        // Profil Ringan (STANDAR-TEKNIS §1b): nolkan eksplisit, framework menyuntikkan default redis lewat merge config.
+        'redis' => null,
 
         'background' => [
             'driver' => 'background',
@@ -103,7 +107,7 @@ return [
     */
 
     'batching' => [
-        'database' => env('DB_CONNECTION', 'sqlite'),
+        'database' => env('DB_CONNECTION', 'mariadb'),
         'table' => 'job_batches',
     ],
 
@@ -122,7 +126,7 @@ return [
 
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'sqlite'),
+        'database' => env('DB_CONNECTION', 'mariadb'),
         'table' => 'failed_jobs',
     ],
 

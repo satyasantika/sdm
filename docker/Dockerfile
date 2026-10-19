@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Image produksi SDM FKIP: PHP-FPM 8.4 (target "app") dan Nginx (target "web") dari satu Dockerfile.
+# Image produksi SDM FKIP: PHP-FPM 8.5 (target "app") dan Nginx (target "web") dari satu Dockerfile.
 
 # ---- (a) aset Vite -------------------------------------------------------------------------------
 FROM node:22-alpine AS aset
@@ -21,14 +21,16 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-progress --no-scripts --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # ---- (c) runtime PHP-FPM -------------------------------------------------------------------------
-FROM php:8.4-fpm-alpine AS app
+FROM php:8.5-fpm-alpine AS app
 COPY --from=ghcr.io/mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo_mysql redis intl gd zip bcmath opcache pcntl \
-    && apk add --no-cache fcgi mysql-client \
+# Profil Ringan (STANDAR-TEKNIS §1b): tanpa dependensi cache terdistribusi terpisah. mariadb-client = mariadb-dump/mariadb untuk cadangan dan pemulihan.
+RUN install-php-extensions pdo_mysql intl gd zip bcmath opcache pcntl \
+    && apk add --no-cache fcgi mariadb-client \
     && rm -rf /var/cache/apk/*
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/php/produksi.ini /usr/local/etc/php/conf.d/zz-produksi.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/zz-sdm.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
