@@ -15,7 +15,7 @@ concurrency:
 jobs:
   uji:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       DB_CONNECTION: mariadb
       DB_HOST: 127.0.0.1
@@ -74,7 +74,7 @@ jobs:
 
       - run: ./vendor/bin/pint --test
       - run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
-      - run: php artisan test --parallel
+      - run: php artisan test
 
       - name: Optimasi produksi (memastikan config/route cache tidak gagal)
         run: composer produksi
@@ -83,7 +83,7 @@ jobs:
     needs: uji
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     concurrency:
       group: deploy-sdm
       cancel-in-progress: false
