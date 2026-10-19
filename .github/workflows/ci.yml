@@ -42,6 +42,7 @@ jobs:
           php-version: "8.5"
           extensions: mbstring, intl, pdo_mysql, zip, gd, bcmath
           coverage: none
+          ini-values: opcache.jit=disable, opcache.enable_cli=0
 
       - name: Cache composer
         uses: actions/cache@v4
