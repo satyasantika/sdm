@@ -228,8 +228,8 @@ class AppServiceProvider extends ServiceProvider
 
         if (parse_url($url, PHP_URL_PATH) !== null && trim((string) parse_url($url, PHP_URL_PATH), '/') !== '') {
             URL::forceRootUrl($url);
-            // asset() memakai config('app.asset_url') sendiri, tidak ikut forceRootUrl() di atas.
-            config(['app.asset_url' => $url]);
+            // asset() membaca assetRoot milik UrlGenerator sendiri; config() saja tidak cukup, config('app.asset_url') hanya dipakai sekali saat UrlGenerator pertama dibuat.
+            URL::useAssetOrigin($url);
         }
 
         if (str_starts_with($url, 'https://')) {
