@@ -228,6 +228,8 @@ class AppServiceProvider extends ServiceProvider
 
         if (parse_url($url, PHP_URL_PATH) !== null && trim((string) parse_url($url, PHP_URL_PATH), '/') !== '') {
             URL::forceRootUrl($url);
+            // asset() memakai config('app.asset_url') sendiri, tidak ikut forceRootUrl() di atas.
+            config(['app.asset_url' => $url]);
         }
 
         if (str_starts_with($url, 'https://')) {
