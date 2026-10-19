@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -154,6 +155,15 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(app()->isProduction());
 
         $this->catatImpersonasi();
+
+        // Pest/ParaTest --parallel: tiap worker butuh database fisik sendiri, bukan berbagi satu
+        // database yang sama -- kalau berbagi, insert bersamaan saling mengunci baris dan melempar
+        // deadlock (SQLSTATE[40001]) secara acak antarworker.
+        if ($this->app->runningUnitTests()) {
+            ParallelTesting::setUpTestDatabase(function (string $database) {
+                DB::statement("CREATE DATABASE IF NOT EXISTS `{$database}`");
+            });
+        }
     }
 
     /** Audit siapa menyamar sebagai siapa, kapan masuk dan keluar (K-15). */
