@@ -71,6 +71,7 @@ jobs:
       - run: npm run build
 
       - run: cp .env.example .env
+      - run: sed -i "s|^APP_URL=.*|APP_URL=http://localhost|" .env
       - run: php artisan key:generate
 
       - run: ./vendor/bin/pint --test
