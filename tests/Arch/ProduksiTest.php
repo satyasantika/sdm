@@ -12,7 +12,7 @@ function komposProduksi(): array
 }
 
 it('hanya memuat layanan app, web, dan scheduler', function () {
-    expect(array_keys(komposProduksi()['services']))->toEqualCanonicalizing(['app', 'web', 'scheduler']);
+    expect(array_keys(komposProduksi()['services']))->toEqualCanonicalizing(['php', 'web', 'scheduler']);
 });
 
 it('tidak memuat container database, redis, atau queue', function () {
@@ -31,7 +31,7 @@ it('tidak memuat container database, redis, atau queue', function () {
 });
 
 it('menghubungkan container ke basis data host lewat host-gateway', function () {
-    foreach (['app', 'scheduler'] as $nama) {
+    foreach (['php', 'scheduler'] as $nama) {
         expect(komposProduksi()['services'][$nama]['extra_hosts'])->toContain('host.docker.internal:host-gateway')
             ->and(komposProduksi()['services'][$nama]['environment']['DB_CONNECTION'])->toBe('mariadb')
             ->and(komposProduksi()['services'][$nama]['environment']['DB_HOST'])->toBe('host.docker.internal');
@@ -39,7 +39,7 @@ it('menghubungkan container ke basis data host lewat host-gateway', function () 
 });
 
 it('memakai driver database untuk cache, sesi, dan antrean di container', function () {
-    $env = komposProduksi()['services']['app']['environment'];
+    $env = komposProduksi()['services']['php']['environment'];
 
     expect($env['CACHE_STORE'])->toBe('database')
         ->and($env['SESSION_DRIVER'])->toBe('database')
@@ -50,7 +50,7 @@ it('menjalankan penjadwal sebagai pemicu worker setelah app sehat', function () 
     $penjadwal = komposProduksi()['services']['scheduler'];
 
     expect($penjadwal['command'])->toBe(['php', 'artisan', 'schedule:work'])
-        ->and($penjadwal['depends_on']['app']['condition'])->toBe('service_healthy')
+        ->and($penjadwal['depends_on']['php']['condition'])->toBe('service_healthy')
         ->and($penjadwal['stop_grace_period'])->toBe('60s');
 });
 
