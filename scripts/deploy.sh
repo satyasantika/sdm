@@ -20,7 +20,7 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-COMPOSE=(docker compose -f compose.production.yaml)
+COMPOSE=(docker compose -f compose.production.yaml --env-file .env.production)
 CABANG="${SDM_CABANG:-main}"
 KEEP_IMAGE_TAGS="${SDM_KEEP_IMAGE_TAGS:-5}"
 HEALTH_ATTEMPTS=24   # 24 x 5 dtk = 2 menit
@@ -42,7 +42,7 @@ kunci() {
 # Port loopback web dibaca dari .env (WEB_PORT); reverse proxy fakultas memotong awalan /sdm.
 url_kesehatan() {
   local port
-  port="$(sed -n 's/^WEB_PORT=\([0-9]\{1,5\}\).*/\1/p' .env 2>/dev/null | tail -n1)"
+  port="$(sed -n 's/^WEB_PORT=\([0-9]\{1,5\}\).*/\1/p' .env.production 2>/dev/null | tail -n1)"
   echo "http://127.0.0.1:${port:-8080}/api/health"
 }
 

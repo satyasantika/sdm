@@ -18,7 +18,7 @@ x-app: &app
     args:
       ASSET_URL: ${ASSET_URL:-https://supportfkip.unsil.ac.id/sdm}
   image: sdm-fkip/app:${APP_VERSION:-latest}
-  env_file: .env
+  env_file: .env.production
   environment: &app-env
     APP_ENV: production
     APP_DEBUG: "false"
