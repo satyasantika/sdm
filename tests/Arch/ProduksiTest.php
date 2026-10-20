@@ -62,6 +62,10 @@ it('membatasi memori dan merotasi log setiap container', function () {
     }
 });
 
+it('web hanya terbuka di loopback, reverse proxy fakultas yang menerbitkan ke publik', function () {
+    expect(komposProduksi()['services']['web']['ports'][0])->toStartWith('127.0.0.1:');
+});
+
 it('menjaga Dockerfile tanpa Redis dan berbasis PHP 8.5 dengan klien mariadb', function () {
     $dockerfile = file_get_contents(base_path('docker/Dockerfile'));
 
