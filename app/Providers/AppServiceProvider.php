@@ -9,6 +9,7 @@ use App\Enums\JenisPengingat;
 use App\Enums\Peran;
 use App\Events\DataPegawaiBerubah;
 use App\Events\KonfigurasiKepegawaianDiubah;
+use App\Http\Livewire\HandleRequestsSubpath;
 use App\Models\Aktivitas;
 use App\Models\BarisImporGagal;
 use App\Models\DokumenPegawai;
@@ -56,6 +57,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
+use Livewire\Mechanisms\HandleRequests\HandleRequests;
 use STS\FilamentImpersonate\Events\EnterImpersonation;
 use STS\FilamentImpersonate\Events\LeaveImpersonation;
 
@@ -91,6 +93,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(Import::class, Impor::class);
         $this->app->bind(FailedImportRow::class, BarisImporGagal::class);
         $this->app->bind(Export::class, Ekspor::class);
+
+        // Livewire getUpdateUri() memakai toRoute(absolute: false); pada APP_URL bersubpath hasil
+        // relatif itu sudah memuat subpath, lalu Livewire membungkusnya lagi dengan url() -> dobel.
+        if (($p = parse_url((string) config('app.url'), PHP_URL_PATH)) !== null && $p !== '' && $p !== '/') {
+            $this->app->bind(HandleRequests::class, HandleRequestsSubpath::class);
+        }
     }
 
     /**
